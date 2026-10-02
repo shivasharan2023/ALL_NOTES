@@ -1,5 +1,4 @@
 Continuous Monitorng with grafana  & Grafan
-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
 # Github link : https://github.com/manifoldailearning/Complete-MLOps-Bootcamp-v2
 
 # Introduction to continous monitoring tools

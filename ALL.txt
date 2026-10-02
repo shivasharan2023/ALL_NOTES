@@ -1,0 +1,20 @@
+<<< Virtual machine creation using vagrant >>>
+open git bash
+>cd  E:/DS/Learning_2026/ShellScripting/ubuntu_box 	#Vagrant file should be available here
+# vagrant init bento/ubuntu-24.04 	#initialization failed, then worked using cmd
+>vagrant up
+>vagrant ssh
+
+
+
+
+
+
+
+
+
+
+<<< <<Linux commands >>>>>
+>pwd
+>whoami
+>cat /etc/os-release

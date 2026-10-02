@@ -1,0 +1,118 @@
+what is makefile ?????
+what is bind mount
+
+sudo su -
+who am i
+
+chmod u=rwx,g=r,o=r 1-install.sh
+
+u = user (owner)
+g = group
+o = others
+
+==> chmod 744 1-install.sh 
+r = 4
+w = 2
+x = 1
+
+rwxr--r-- ===>
+
+------------------------------------------------
+ps aux | grep prometheus
+
+ps aux is a Linux command used to display all currently running processes on the system.
+
+ps aux
+Break it down
+Part	Meaning
+ps	Show information about running processes
+a	Show processes of all users
+u	Show processes in a user-oriented format
+x	Include processes that don't have a controlling terminal
+
+So, ps aux gives you a detailed list of almost all processes running on the machine.
+
+Example output
+USER       PID %CPU %MEM    VSZ   RSS TTY      STAT START   TIME COMMAND
+root         1  0.0  0.1  16904  1120 ?        Ss   10:00   0:01 /sbin/init
+root       523  0.2  1.2 123456 50000 ?        S    10:01   0:05 python app.py
+ubuntu     891  1.5  3.4 234567 140000 pts/0    Sl   10:02   0:20 python train.py
+Important columns
+
+USER
+
+Who started the process.
+
+root
+ubuntu
+
+PID
+
+Process ID — a unique number assigned to the process.
+
+PID
+523
+891
+
+You can use it to terminate a process:
+
+kill 523
+
+%CPU
+
+Percentage of CPU currently being used by the process.
+
+%MEM
+
+Percentage of system RAM being used.
+
+VSZ
+
+Virtual memory allocated to the process.
+
+RSS
+
+Actual physical RAM currently used by the process.
+
+STAT
+
+Current process state.
+
+For example:
+
+R = Running
+S = Sleeping
+D = Uninterruptible sleep
+Z = Zombie
+
+COMMAND
+
+The command/program that started the process.
+
+Very useful combination
+
+If you want to find a particular process:
+
+ps aux | grep python
+
+For example:
+
+ubuntu   891  1.5  3.4 ... python train.py
+
+This means you can see whether a Python application is running and its PID.
+
+ps vs ps aux
+ps
+
+Usually shows processes associated with your current terminal.
+
+ps aux
+
+Shows processes across the system, including processes belonging to other users and those without a terminal.
+
+For Linux/Cloud work, ps aux is particularly useful when you want to investigate high CPU/RAM usage, stuck processes, or running services.
+----------------------------------------------------------------------------------------------------------------------------------------------
+??? sign in using root user email-aws login
+----------------------------------------------------------------------------------------------------------
+difference betwwn x86 and arm64 architectures, which is better to choose while launching aws ec2
+----------------------------------------------------------------------------------------------------------

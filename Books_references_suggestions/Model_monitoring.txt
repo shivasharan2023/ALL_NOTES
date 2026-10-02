@@ -1,0 +1,78 @@
+suggest a best book for ml model monitoring
+
+If your main goal is specifically ML model monitoring—data drift, concept drift, performance monitoring, alerting, retraining, and production observability—I’d approach the books slightly differently from general MLOps.
+
+My recommendation
+
+1. Model Monitoring: Drift, Metrics & Retraining — Mohan Rayithi (2026)
+This is the most directly aligned book I found with your requirement. It is specifically focused on monitoring rather than treating monitoring as just one chapter of MLOps. It covers data drift, concept drift, performance metrics, fairness, explainability, SLOs, retraining decisions, and monitoring in regulated environments. It is 392 pages.
+
+2. Designing Machine Learning Systems — Chip Huyen (2022)
+For your longer-term ML/MLOps career, I would actually consider this the more important book. It covers production ML architecture, data distribution shifts, monitoring, feedback loops, deployment, and maintenance. It gives you the system-design thinking around monitoring rather than just individual drift techniques.
+
+3. Reliable Machine Learning — Cathy Chen et al.
+Very useful once you want to understand production reliability and observability. Its monitoring chapter covers production monitoring, observability, and alerting for ML systems.
+
+4. Machine Learning in Production — Andrew Ng / CMU-oriented production engineering text
+Useful for connecting monitoring with the broader production lifecycle. It specifically includes performance planning/monitoring, observability, SLOs, model quality, data quality, and drift/data-quality monitoring.
+
+For your particular learning goal
+
+Since you've been looking for a resource specifically on drift detection + retraining + performance monitoring, I'd use this sequence:
+
+Priority	Book	Main purpose
+⭐ 1	Model Monitoring: Drift, Metrics & Retraining	Deep dive into monitoring
+⭐ 2	Designing Machine Learning Systems	Production ML architecture
+3	Reliable Machine Learning	Reliability & observability
+4	Machine Learning in Production	Full production lifecycle
+
+One caution: the first book is very new (2026), so it doesn't have the long track record of Chip Huyen's book.
+
+What I'd recommend for you
+
+Given that you're learning MLflow + Kubernetes + FastAPI + CI/CD + model monitoring, don't spend months reading a general MLOps book.
+
+Start with:
+
+Model Monitoring → Designing ML Systems → hands-on monitoring project
+
+And make the project include:
+
+Production Model
+      │
+      ├── Data Quality
+      │     ├── Missing values
+      │     ├── Schema changes
+      │     └── Outliers
+      │
+      ├── Data Drift
+      │     ├── PSI
+      │     ├── KS Test
+      │     └── Distribution comparison
+      │
+      ├── Prediction Monitoring
+      │     ├── Prediction distribution
+      │     └── Class imbalance
+      │
+      ├── Model Performance
+      │     ├── Precision
+      │     ├── Recall
+      │     ├── F1
+      │     └── ROC-AUC
+      │
+      ├── Concept/Performance Drift
+      │
+      ├── Infrastructure
+      │     ├── Latency
+      │     ├── RPS
+      │     └── CPU/Memory
+      │
+      └── Alert → Retraining → Validation → Deployment
+
+For your fraud-detection/financial ML background, I'd pay particular attention to precision/recall changes, population drift, delayed ground truth, concept drift, threshold monitoring, segment-level monitoring, and retraining triggers rather than just generic accuracy monitoring.
+
+Also, a 2025 literature review covering 136 papers found that ML monitoring encompasses data patterns, operating context, performance degradation, metrics, and runtime issues—not merely drift detection.
+
+If you want 
+one book only, I'd pick Model Monitoring: Drift, Metrics & Retraining for your specific requirement; if you want 
+one book to build your overall MLOps career around, I'd pick Designing Machine Learning Systems.

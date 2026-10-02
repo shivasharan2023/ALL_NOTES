@@ -1,0 +1,85 @@
+#### Installation of Prometheus
+ 
+- Ubuntu
+- Launch EC2 instance
+	- launch AWS ec2 >>t2.micro>> allow SSH/HTTPS/HTTP>>storate-EBS volume:20gb, gp2
+	- once launcged > security>security groups>edit inbound rules>add rule>all TCP>anywhare IPv4, similarly ad one more for IPv6
+#Clone source code
+Reffer README.md file for prometheus & grafana installatio using .sh files
+<browser> http://publicIpv4:9090
+
+# install prometheus
+PROMETHEUS_VERSION="2.47.1"
+>sudo su -
+wget https://github.com/prometheus/prometheus/releases/download/v${PROMETHEUS_VERSION}/prometheus-${PROMETHEUS_VERSION}.linux-amd64.tar.gz
+tar -xzvf prometheus-${PROMETHEUS_VERSION}.linux-amd64.tar.gz
+cd prometheus-${PROMETHEUS_VERSION}.linux-amd64/
+# if you just want to start prometheus as root
+#./prometheus --config.file=prometheus.yml
+
+# create user
+useradd --no-create-home --shell /bin/false prometheus 
+
+# create directories
+mkdir -p /etc/prometheus
+mkdir -p /var/lib/prometheus
+
+# set ownership
+chown prometheus:prometheus /etc/prometheus
+chown prometheus:prometheus /var/lib/prometheus
+
+# copy binaries
+cp prometheus /usr/local/bin/
+cp promtool /usr/local/bin/
+
+chown prometheus:prometheus /usr/local/bin/prometheus
+chown prometheus:prometheus /usr/local/bin/promtool
+
+# copy config
+cp -r consoles /etc/prometheus
+cp -r console_libraries /etc/prometheus
+cp prometheus.yml /etc/prometheus/prometheus.yml
+
+chown -R prometheus:prometheus /etc/prometheus/consoles
+chown -R prometheus:prometheus /etc/prometheus/console_libraries
+
+# setup systemd
+echo '[Unit]
+Description=Prometheus
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+User=prometheus
+Group=prometheus
+Type=simple
+ExecStart=/usr/local/bin/prometheus \
+    --config.file /etc/prometheus/prometheus.yml \
+    --storage.tsdb.path /var/lib/prometheus/ \
+    --web.console.templates=/etc/prometheus/consoles \
+    --web.console.libraries=/etc/prometheus/console_libraries
+
+[Install]
+WantedBy=multi-user.target' > /etc/systemd/system/prometheus.service
+
+systemctl daemon-reload
+systemctl enable prometheus
+systemctl start prometheus
+
+#### Installation of Grafana
+- Ubuntu
+>sudo apt-get update
+>sudo apt-get install -y apt-transport-https wget gpg
+>sudo mkdir -p /etc/apt/keyrings
+>wget -q -O /etc/apt/keyrings/grafana.key https://apt.grafana.com/gpg.key
+>echo "deb [signed-by=/etc/apt/keyrings/grafana.key] https://apt.grafana.com stable main" | sudo tee /etc/apt/sources.list.d/grafana.list
+
+>sudo apt-get update
+>sudo apt-get install grafana
+>sudo systemctl daemon-reload
+>sudo systemctl start grafana-server
+>sudo systemctl status grafana-server
+>sudo systemctl enable grafana-server
+
+##### Prometheus Configuration file
+>cat pometheus.yaml

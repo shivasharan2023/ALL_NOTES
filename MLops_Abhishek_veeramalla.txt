@@ -1,0 +1,228 @@
+MLOPS-Zero-to-Hero- Abhishek veermalla
+Github resources url
+
+# Model deployment and serving using virtual machines
+1.https://github.com/iam-veeramalla/Intent-classifier-model/tree/virtual-machines
+
+# Model deployment and serving using kubernetes
+2.https://github.com/iam-veeramalla/Intent-classifier-model/tree/kubernetes
+
+# KServe
+3.https://github.com/iam-veeramalla/Intent-classifier-model/tree/kserve
+
+###########################################################################################
+##### Notes: Model deployment and serving using kubernetes (Using EKS) (Manual not CI/CD)
+> for local development use kind > fast to install & light weight > kubernetes running in a single docker container
+>kind userguide > quick start>installing with a package manager > on windows (chaco install kind)
+>kind create cluster --name=345-demo-cluster
+
+org-level>> EKS/AKS/GKE/Openshift/self (spinning using Terraform)
+org-level>> individual clusters for dev, staging, prod & for individual teams namespaces will be created
+	    for each NS resourse quota set
+
+
+how to create EKS and delete resources available in 02-create-k8s-cluster.md in github repo
+
+Task: implement it on GKE also)
+
+######STEP1 :  CREATE KUBERNETES CLUSTER ON AWS EKS
+
+AWS EKS Creation:
+AWS>>Cloudshell
+STEP1: Check Prerequistes
+>aws s3 ls		# just to check whether AWS CLI is installed
+>kubectl		# to check kubectl is installed
+>eksctl			#eksctl for managing EKS # if eksctl is not installed refer eksctl user guide in aws 
+
+STEP2: Create cluster
+# Using Console:
+AWS>EKS>>create cluster
+
+# Using aws cli
+eksctl create cluster \
+  --name my-cluster \		# cluster name
+  --region us-east-1 \
+  --version 1.32 \		# kubernetes version
+  --nodegroup-name standard-workers \
+  --node-type t3.medium \
+  --nodes 2 \
+  --nodes-min 1 \
+  --nodes-max 3 \
+  --managed 
+# take 15 to 20 minutes to create cluster
+# to track the progress go to CloudFormation > select cluster name > events tab
+?? data plane
+# This command automatically creates:
+VPC, Subnets
+EKS Control Plane
+Managed Node Group
+IAM roles & required resources
+
+STEP 3: Configure kubeconfig
+If needed, update kubeconfig manually:
+>aws eks update-kubeconfig --region us-east-1 --name demo-cluster
+>kubectl config current-context		#should be demo cluster
+>eksctl get cluster			#List all clusters
+>aws eks describe-cluster --name demo-cluster --region us-east-1 			#Describe cluster
+
+Verify nodes:
+>kubectl get nodes
+>kubectl get pods -n kube-system
+
+
+#### STEP2 : CREATE KUBERNETES OBJECTS (namespace, deployment, service)
+pre-rquisite : Docker image available on docker hub
+oredr of manifests>>namespace.yaml>>deployment.yaml>>service.yaml
+pod not created directly instead created via deployment resource
+number of required pods>> replica set>> resource limits decides whther all pods fit on the available name space>>?? dynamic scaling
+Dynamic scaling >> HorizontalPodAutoscaler >> if the nodes don't have enough capacity>> node auto scaler
+On EKS, you can use technologies such as Karpenter or Cluster Autoscaler; EKS also has EKS Auto Mode, which can automatically create additional nodes when Pods can't fit and later consolidate/remove nodes.
+??? Service discovery mechanism
+User --> Service (proxy)-->pod  #service keeps track of the ip as pods get destroyed and recreated their IPs will be changing
+## code
+#aws cli
+>git clone https://github.com/iam-veeramalla/Intent-classifier-model.git
+>cd Intent-classifier-model
+>git checkout origin/kubernetes
+>ls
+>cd 04-k8s-manifests
+>kubectl apply -f namespace.yml
+>kubectl get ns
+>kubectl get all -n intent-namespace
+# change image name in deployment.yml==> abhishekf5/intent-classifier-model:v1
+>kubectl apply -f deployment.yaml -n intent-namespace
+>kubectl get pods -n intent-namespace
+#in service.yaml why clusterIP listen to video carefully
+#change to NodePort so that it can be accessed on node ip
+>vim service.yaml
+>kubectl apply -f service.yaml -n intent-namespace
+>kubectl get all -n intent-namespace
+
+
+##deployment.yml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: intent-classifier
+  namespace: intent-namespace
+  labels:
+    app: intent-classifier
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: intent-classifier
+  template:				# this is for labelling pods
+    metadata:
+      labels:
+        app: intent-classifier
+    spec:
+      containers:
+        - name: intent-classifier
+          image: <image-name>
+          ports:
+            - containerPort: 6000
+
+#### STEP3 : MODEL SERVING
+#if the node ip is public any one can access the model using noteip:nodeport
+>kubectl get nodes -o wide 			#copy external-IP (3.108.3.242)
+>kubectl get svc -n intent-namespace 		#copy Port number (80:31479)
+>curl -X POST http://3.108.3.242:31479/predict -H "Content-Type: application/json" -d '{"text":"Hi, Whats up??"}'
+
+	#in real time node ip is not public #ingress
+	#install ingress controller-->looks for ingress resource-->cretaes LB (public-private)(public facing)
+	#user-->LB-->svc-->pod
+
+## Ingress controller deployment (Traefic ingress controller - light weight, ingress nginx getting depricated)
+	#traefic installed on cluster not for namespace
+	# create ingress resource in namespace - read by ingress controller--> creates LB
+>helm repo add traefic https://helm.traefik.io/traefic	#if helm not installed helm.sh/docs/intro/install  section: from script
+>helm install traefic traefic/traefic \
+	--namespace traefic \
+	--create-namespace
+>kubectl get all -n traefic
+
+
+#### STEP4: MODEL SERVING
+# create ingress resource
+>kubectl get pods -n traefic			# copy pod name
+>kubectl logs <pod_name> -n traefic -f		#floats logs
+
+#go to another tab
+>cd Intent-classifier-model/
+>ls
+>git pull origin kubernetes
+>vim 06-ingress.yaml			#change host to -example.com
+>kubectl apply -f 06-ingress.yaml		# check lofs on another tab
+>kubectl get ingress  -n intent-namespace		#in orgs adress will be mpped to hosts steps: buy domain, register domain, and map the DNS A records
+>curl _X POST --resolve example.com:80:<address> http://example.com/predict -H "Content-Type: application/json" -d '{"text":"I want to cancel my subscription"}'
+#### Complet from time 8.20
+
+
+#=================================================================================================================================================================
+							MODEL DEPLOYMENT AND SERVING : KServe
+#=================================================================================================================================================================
+
+### CREATE KUBERNETES CLUSTER
+>kind create cluster --name=kserve-demo-intent
+
+### INSTALL KSERVE
+#install cert manager
+#should have cert manager installed
+>kubectl apply -f https://github.com/cert-manager/releases/latest/download/cert-manager.yaml
+>kubectl get pods -n cert-manager
+
+# install CRDS (Custom Resource Definition)
+>kubectl create namespace kserve		#create namespace
+>helm install kserve-crd oci://ghcr.io/kserve/charts/kserve-crd \		#installs kserve-crd
+
+# install kserve
+>helm install kserve oci://ghcr.io/kserve/charts/kserve \		#installs kserve #kserve installed at cluster level
+
+# attach model as release binary to github repo
+github repo>>select branch >> tag>>releases>>Draft a new release>>Traget-Kserve>>select tag>>create new tag - 3.0>>create>>release title - v3.0>>attach binaries by dropping them - attach the .pkl model>>publish release 
+
+github repo>>select branch >>KServe-implementation.md>> change storageUri to 
+
+# create namespace
+>kubectl create ns intent 
+>cat <<EOF | kubectl apply -n intent -f -
+apiVersion: serving.kserve.io/v1beta1
+kind: InferenceService
+metadata:
+  name: intent-classifier
+spec:
+  predictor:
+    model:
+      modelFormat:
+        name: sklearn
+      storageUri: "<downloadable location>"		# Change this something like https://github.com/iam-veeramalla/Intent-classifier-model/releases/donwload/3.0/intent_model.pkl
+      resources:
+        requests:
+          cpu: "100m"
+          memory: "512Mi"
+        limits:
+          cpu: "1"
+          memory: "1Gi"
+EOF
+
+# View kserve logs
+>kubectl get pods -n kserve				# copy name of the pod
+>kubectl logs <name_of_kserve_pod> -n kserve
+
+# Confirm horizontalpodautoscaler created
+>kubectl get horizontalpodautoscale.autoscaling -n intent 
+
+# Confirm service created
+>kubectl get svc -n intent
+
+# Enable port forwarding
+>kubectl port-forward scv/<name_of_svc> 8080:80	-n intent --address 0.0.0.0		#80:service port   8080:localport
+
+# Run curl command for prediction serving request
+#go to another tab
+>curl -s -X POST http://localhost:8080/v1/models/intent-classifier:predict \
+  -H "Content-Type: application/json" \
+  -d '{"instances":["I want to cancel my subscription"]}' | jq
+
+

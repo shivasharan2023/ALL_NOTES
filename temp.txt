@@ -1,0 +1,51 @@
+>kubectl get ns
+How & where to install helm
+>helm --version
+>helm repo add harness-delegate https://app.harness.io/storage/harness-download/delegate-helm-chart
+>heml repo update harness-delegate
+install the delegate
+<td> get code
+>kubectl get ns #harness-delegate-ng vissible
+>kubectl get pods -n harness-delegate-ng #one pod should be running
+Verufy delegate connection to harness manager
+
+
+
+
+#### Oracle vm
+ssh -i Downloads/ssh-key-2026-09-06.key opc@80.225.254.98
+sudo -i
+sudo dnf update
+cat /etc/os-release
+top or sudo htop or vmstat or df -h
+
+# check directories in root file system
+pwd
+cd /
+ls
+# check home directory file system
+# How to install minikube
+
+
+
+
+#### AWS vm
+sudo apt-get update
+sudo apt-get upgrade
+python version
+pip version
+
+#### kubernetes cluster creation
+kind --version
+kind create cluster
+kind get clusters
+kubectl get nodes
+kubectl create deployment nginx --image=nginx
+kubectl expose deployment nginx --port=80 --type=NodePort
+kind delete cluster
+
+key-pair : my-instance
+
+
+
+# installations o be done using sudo ?

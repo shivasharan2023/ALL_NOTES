@@ -1,0 +1,314 @@
+		AWS
+************* Miscelleneuos *************
+??What is disk usage in task manager
+
+***************************************
+##### Master DevOps with AWS, Docker, Kubernetes, GCP, GitHub Actions, ArgoCD, GitOps, Terraform, Monitoring & AI #####
+##### Imran Teli #####
+###### WHAT IS CLOUD COMPUTING ############
+??how server is different from computer
+??Vurtualizing computers, installing hypervisers
+vurtual machines, virtual storages, virtual netwrok, any virtual service - cloud computing
+accessing virtualized resources over internet
+?? Private cloud computing/public cloud computing
+Different services of AWS cloud
+   1.IaaS (ex.Ec2)
+   2.PaaS (AWS RDS)
+   3.SaaS
+#### INTRODUCTION ####
+AWS- region, Zones (2 to 6), single zone - multiple data centres, clustered data centres
+infrastructure.aws
+main focus:
+    1.sysops & devops services	
+    2.Developer services
+    3.Ec2, beanstalk, storage, efs, glacier
+    4.Database service : RDS, elasticcache
+    5.Networking services - VPC, cloudfront, Route s3 
+    6.Cloud watch, IAM
+sysops services, devops services, developer services, security services, networking services
+#### EC2 ####
+virtual machine and related services
+scale up/down possibility - RAM, CPU, Network, storage
+can be integrated with several other services
+EC2 pricing
+	1.on demand
+	2.reserved
+	3.Spot
+	4.Dedicated hosts (pysical server dedicated for you)
+AMI-Amazon Machine Image
+Ec2 -RAM, CPU, network speed, storage speed
+EBS - Elastic block storage, virtual hard disks on which we store operating system & our data
+SG - will have on every EC2 instance, firewall, inbound/outbound traffic
+EC2 uses public-key cryptography to encript and desciptlogin information
+When an Ec2 called as Virtual machine or virtual server
+not regions , Zones are the pysical data centres
+instance -Virtual machine on aws
+EC2 instance- virtual server on aws
+AMI- vagrant boxes of aws
+SG- firewalls
+you can reserve a public ip and attache to instance
+AWS Linux image- similar to centos
+??macos image
+explore AWS market place - images with specific softwares preinstalled
+?/which image from market place best suited for devops or mlops
+community AMI's , How to build a AMI
+explore ec2 machine types- check cpu/memory/Network Bandwidth(Gbps)/EBS Bandwidth(storage bandwidth, harddisk)
+what are compute optimized and memory optimised machines
+.pem for openssh, .ppk for putty
+private key will be downloaded
+network settings-source type : from where you want to allow port22, from where the access will be coming
+MyIP : it is going to automatically find my public ip (my internet public IP)
+internet routers will have dynamic public ip
+when it changes we need to update the source type 
+
+AWS Console-->select region (N.virginia, us-east-1, cheaper)-->search EC2-->Dashboard-->service health-->Zones
+instances-->launch instances-->Name & Tags-->add additional tags-key:Name, Value:web01, resource type -select instance, volume, netwrok interfaces-->add new tag-->key:Project, Value:Titan, resource type -select instance, volume, netwrok interfaces--add new tag-->key:Env, Value:Dev, resource type -select instance, volume, netwrok interfaces
+-->select AWS linux image
+-->select instance type
+-->keypair login : create new keypairlogin (RSA, .pem)
+-->netwrok settings --.security group name -->description-->inbound security group rules : type: ssh, source type:MyIP -->description (ex. Allow 22 from my office)
+--> configure storage :
+-->Advanced details : add user data (to run commands) (ex. if softawares needs to be installed) as this is Linux we should provide #!/bin/bash on first line
+for present give these commands : dnf install httpd -y     systemctl start httpd     systemctl ebnable https  (each on seperate lines)
+check how write environment variables on instance lanching
+
+upon launch check Monitoring (CPU utilization etc.)
+take public ip from details and ssh from git bash or terminal
+-->actions-->connct-->SSH client : get the command to ssh to the instance
+in the ssh command (at the end provide IP adress or DNS name)
+>>exit to logout
+>>sudo -i 		#impartant
+>>cat /etc/os-release
+>>systemctl status httpd
+>>curl http://127.0.0.1	#to check instance has default webpage
+>>ps -ef | grep http 	#shows processes running
+>>ss -tunlp | grep 3374 (one of the process id returned from above command) (shows which port is open fro this process)
+
+Private IP - to SSH from teminal
+public IP - to connect from internet 
+
+on internet : http://<public_ip>:80  (http default port is 80)
+--> security group-->edit inbound rules-->add rule-->customTCP, port range : 80, anyware IPv4
+add one more with anyware IPv6
+
+anyware IPv4 - wxpose to the world
+??IPv4 vs IPv6
+
+-->select instance-->instance state-->Terminate(delete) instance
+#### More EC2-part1 ####
+1.Requirement gathering
+2.create key-pair 9before launching instance)
+3.Create SG (firewall)
+4.Launch instance
+
+Requirement gathering
+1.OS
+2.Size: RAM/CPU/Netwrok speed etc.  -- --> dev go with minimum
+3.Storage size : OS storage, applications that we run
+4.project
+5.Services/apps running
+6.Environment (Dev, QA, staging, prod)
+7.login user/owner
+
+-->AWS console-->EC2-->Network&security -->key pairs-->delete key pair
+???privatekey vs public key
+
+-->create key-pair -->name : project name/environment name (ex. moso-dev-nvir), RSA, .pem-->tags- key:Name value:Moseo-dev-nvir-->create key-pair 9this downloads private key)
+
+-->SG-->actions-->Delete previous security groups
+Not allow to delete as network interface is attached to it 
+--_Network interfaces--> actions-->detach-->delete (like every computer has a network adapter, SG creates an interface)
+-->SG-->create SG-->Name- moso-web-dev-sg-->Description- moso-web-dev-sg-->inbound rules- type:SSH, source :MyIP
+lets keep this one, later when you deploy web service come back and add rule for port 80 (Do not add rules in advance)
+
+*Devide the security group based on environment and then type of service
+*in corporate networks public ip will be static
+
+-->outbound rules--> keep same (Do not touch outbound rule ever) -->Tags-->key:name, Value : meso-web-dev-sg --> create security group
+*if make any change to outbound rule, we will not have internet connectivity to instance
+*internet traffic goes out on various different ports
+*most of the time it is handled by a proxy
+*outbound rule will be given for proxy IP
+*proxy server will handle the internet traffic
+
+-->EC2-->Launch instance-->add tags- Name (web01)/Project(meso)/Environment(dev)/Owner(DevOpsTeam), resource type(instances/volumes/network interfaces)
+-->image : ubuntu-->instance type : t2 micro-->key-pair: select donwload path-->Netwrok settings-->edit-->firewall(security groups)-->select existing security group -->Advanced details-->user data (add commands if required)-->launch instance
+
+-->take public ipv4 SSH to machine  (ssh -i <pathto key-pair> ubuntu@publicipv4)
+>>sudi -i
+>>apt update && apt install apache2 -y
+>>systemctl status apache2
+**** not complete, pending
+
+#### More EC2-part2 ####
+private ip of instatnce is static 
+public ip is dynamic 
+when instance is shut down, public ip will be released back, when the instance is powered on again,will get new public ip
+
+-->EC2-->selct instance-->instance state-->stop instance
+--cleck refresh-->check public ip is gone
+-->select instance-->instance state-->start instance-->
+
+to have reserve public IP-->network & security--> Elastic IP
+*limit aws gives 5 Elastic ip, if more required talk to support
+*elastic ip's are not free
+*elastic ip- static public IP
+--EC2-->network & security--> Elastic IP-->allocate elastic ip adress-->select region-->allocate
+-->select newly creted elastic ip-->actions-->associate elstic ip address-->instance-->select instanvce name-->associate
+-->go back to instance -->select-->refresh-->check public ip address
+test stop and start this instance 
+*publicip, privateip, elastic ip are attached to netwrok interface
+**if there are any associated resources of the EC2 instance - check on the EC2 dashboard
+
+**** not complete, pending
+
+#### AWS CLI ####
+**** pending
+
+#### SSM & CoudShell Intro ####
+SSM- AWS system Manager
+- ex. running a command on hundreds of EC2 instances,like restarting a service or installing a patch
+create EC2 and how to access it through AWS systmes manager
+-->Launch EC2-->name-server1-->image-->ubuntu-->instance type-->t2.micro-->SG-select existing SG-->Launch instance
+create user & assign permission
+??one service wants to connect to another service -ex. EC2 wants to connect to SSM - we use roles (different from user with assigne permission)
+-->IAM-->ROles-->create roles-->AWS service-->usecase-EC2(creating for EC2)-->next-->AmazonSSMManagedinstanceCore-->next-->descirption- AmazonSSMManagedinstanceCore)Allows EC2 instance to call AWS services on your behalf)-->create role
+Attache this role to EC2
+-->select EC2-->Actions-->Security-->modify IAM role-->select role from Drop down-->update IAM role
+
+Access EC2 from SSM
+-->AWS Systems Manager-->Node tools-->session Manager-->Start Session-->Reason for session - ShellAccess (give anythong) -->select EC2 instance-->Next-->Next-->Start Session
+>>sudo -i
+>>cat /etc/os-release
+>>apt update
+close the session
+
+want to run a command on one or more machines 
+-->AWS system Manager-->Note Tools-->Run Command-->Run command-->search & select AWS-RunShellScript -->in command parameters box - ls -l /var/log \n frre -m \n sudo apt update -->working directory (mention if required)-->Target selection-->Choose a resource group-->select machine-->Run-->select instance-->view output
+
+AWS Cloud shell
+>>aws ec2 decribe-instances
+>>aws s3 ls
+AMAZOn Q
+*** pending resources deletion
+
+#### EBS - Elastic Block Storage ####
+Google search - AWS EBS types
+
+-->EC2-->os:AWS Linux-->advanced detaile-->user data-->paste below data
+#!/bin/bash
+yum install httpd wget unzip -y
+systemctl start httpd
+systemctl enable httpd
+cd /tmp
+wget https://www.tooplate.com/zip-templates/2119_gymso_fitness.zip
+unzip -o 2119_gymso_fitness.zip
+cp -r 2119_gymso_fitness/* /var/www/html/
+systemctl restart httpd
+-->Launch instance
+copy public ip & SSH to it
+>>ssh -i Downloads/xxxxx.pem ec2-user@<public ipv4>
+>>sudo -i
+>>systemctl status httpd
+>>ls /var/www/html/
+>>ls /var/www/html/images/
+open in browser using public ip
+These images are stored on EBS
+>>fdisk -l  #lists all available or connected hard disks
+>>df -h		#Partitions
+/dev/xvda1 - connected or mounted on /
+there is no other separate parttion to store except/boot/efi
+now if you want a seperate partition for any perticular directory, we need to have aother hard disk or any sperate partition we need to create, and then we can mount it
+-->EC2-->Storage-check root device name-->click on volume id-->change name ot web01-ROOT-volume
+-->crate volume-->volume type-gp3-->size - 5gib-->availability zone -us-east-1c (should be same as ec2)-->encrypt this volume
+-->selct volume-->actions-->attach volme-->select ec2-->device name-/dev/sdf-->attach volume
+SSH to instance
+>>fdisk -l
+>>fdisk /dev	
+>>n
+>>p
+>>w
+>>fdisk -l
+>>mkms
+>>mkfs.ext4
+>>ls /var/www/html/images/
+>>mkdir /tmp/img-backup
+>>mv /var/www/html/images/* /tmp/img_backup
+>>ls /var/www/html/images
+>>mount /dev/xvdf1 /var/www/html/images
+>>df -h
+>>mv /tmp/img-backup/* /var/www/html/images/
+>>systemctl restart httpd
+refresh website
+/var/www/html/images is temporary -- how t do a permanant mount
+>>systemctl restart httpd
+>>unmount /var/www/html/images
+>>df -h
+Permanant mount
+>>vi /etc/fstab
+on last line write /dev/xvdf1  /var/www/html/images ext4 defaults 0 0
+:wq
+>>df -h
+>>mount -a 
+ 
+??magnetic storage
+#### VProfile PROJECT SETUP MANUAL & AUTOMATED ####
+Java project - local
+Multi tier Web Application stack
+need:
+Hypervisor--Oracle VM virtual box
+Auomation -- Vagrant
+CLI--gitbash
+IDE--sublime text (or notepad plus or vscode)
+
+vmautomation locally--baseline for upcoming projects
+Architecture of project--
+	NGINX/TOMCAT/RABBITMQ/MEMCACHED/MYSQL
+Architecture of automated setup
+	Vagrant/Virtual box/gitbash
+
+#### AWS CLOUD FOR PROJECT SET UP ####
+## INTRODUCTION
+Lift & shift strategy
+ELB--> replacement of nginx LB
+Autoscaling, how in onprem infra
+Rout53--> for private DNS service
+Project--> EC2-->ELB-->Auto Scaling-->EFS/S3-->ACM-->ROute 53
+ACM-Amazon Certificate Manage 
+Apache tomcat-Java Web Application Service
+if an web application is written in java, tomcat is famous service to host it
+NFS server- external storage for web application
+if you have a cliuster of servers & if you need a centralized storage you can store it in NFS
+Login details will be stored in MYSQL DB
+RobbitMQ-->connected to Tomcat -dummy just added for complexity
+RabbitMq-message broker or queing agent to connect two applications together
+application will run SQL query to access the user information stored in MySQL
+before it goes to MySQL- the request goes to MEMCACHEservice
+Memcache-database caching service- will be connected with mysql server
+
+another architecture-
+	vagrant to automatically set up Vm's
+	vagrant communicates with oracle virtual box(hyperviser) 
+	vagrant creates VM's on OVB
+	Batch scripts or batch commands to set upservices (Nginx/Apache tomcat/rabbitq/memcached/mysql)
+	vm's created for Nginx/Apache tomcat/rabbitq/memcached/mysql
+Flow of execution
+	-Set up tools
+	-Clone source code
+	-cd to vagrant dir
+	-Bringup VM's
+	-Validate
+	-Set up all service
+		- Mysql	
+		- Memcached
+		- Rabbit MQ
+		- Tomcat
+		- Nginx
+		- app build and deploy
+	- Verify from the browser
+## VM setup
+create virtual machines using vagrant file
+github.com/hkhcoders/vprofile-project
+Vscode
+-->source code symbol (or ctr+Shift+G)-->clone repository-->paset git URL-->Enter-->select path-->select as repository distination-->Open-->switch to local branch using icon at the bottm left
+**s**stopped at 6.27

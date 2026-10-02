@@ -1,0 +1,217 @@
+Continuous Monitorng with grafana  & Grafan
+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
+# Github link : https://github.com/manifoldailearning/Complete-MLOps-Bootcamp-v2
+
+# Introduction to continous monitoring tools
+- Observe & detect compliance issues & security threats during the each phase of devops/mlops
+- monitoring required metrics
+-Continuous monitoring tools
+	1. Monitoring tools
+  	2.Alerting tolls
+	3.Metric storage
+	4.Visualization tools
+- Monitoring tools
+	- Monitor infrastructure & application performance
+	- on-prem , cloud or containerized environments
+	- improve system performance, productivity, reduce system downtime
+	- Prometheus, sensu, Nagios
+- Alerting tools
+	- Slack, Servicenow, PagerDuty
+- Metric storage
+	- splunk, aws, influxdb 
+	- once automating configuration management, alerting, monitoring we have whole lot of data to learn from
+	- storage systems required
+	- what can be learnt: system capacity, user behaviour, service level, security risk etc 
+- Visualization tools
+	- Grafana
+	- can be used on top of variety of different data stores like graphite, influxdb, elasticsearch, prometheus etc.
+
+# Use cases of continous monitoring (at mannifold)
+- Prometheous : collection o metrics & Grafana : Dashboard
+
+# Introduction to prometheus
+- Opensource monitoring solution
+- capture metrics & alerting
+- Time series data:identified by metric name & key/value pair : metric name (cpu usage)/label (system= 1)/sample (65%) 
+- disk usage/system= 1/70%
+- scrapped data stored in prometheus server
+- PromQL (readonly language)
+- Generate visualizations using built in expression browser or integrate with grafana
+- written in Go language
+- stores metrics in memory and local disk on an own custom, efficient format
+
+# Architecture of Prometheus
+- Prometheus server pulls data from various end points (IoT devices, client applications, or server where multiple applications are running ex. kubrnetes cluster)
+- short lived jobs- push the metrics to pushgateway, prometheus pulls metrics from Pushgateway
+- alert Manager- helps to send alerts based on the conditions set on the basis of monitoring
+- Data Visualization & export: Prometheus  server-->PromQL-->Prometheus WebUI or Grafana or
+- API clients can connect to Prometheus and run PromQL query and fetch the metrics
+- Exporters and integrations : 
+***** Complete
+# Metrics types in Prometheus
+-  Counter/Gauge/Hsitorgram/Summary
+- Counter - cummulative metric that represent a sigle monotonically increasing counter whose value can only increase or be reset to zero on restart
+- ex. # of requests served, tasks completed, errors
+- dont use for ex. # on currently running processes, CPU usage
+- Gauge : Single numerical value that can go up or down
+- ex. memory usage, cpu usage, # of concurrent requests
+- Histogram : 
+- Summary metric: ???????
+
+# Installation of Prometheus
+- for ubuntu ?????
+- for windows
+	1.Download binaries : https://prometheus.io/download/ (choose windows os)
+	2.Open Command Prompt or PowerShell.
+	3.Navigate to the folder where you extracted Prometheus.
+	4.Run the following command to start Prometheus: prometheus.exe --config.file=prometheus.yml.
+	5.Open a web browser and go to http://localhost:9090 to access the Prometheus web interface
+
+- for ubuntu
+	- launch AWS ec2 >>t2.micro>> allow SSH/HTTPS/HTTP>>storate-EBS volume:20gb, gp2
+	- once launcged > security>security groups>edit inbound rules>add rule>all TCP>anywhare IPv4, similarly ad one more for IPv6
+	- this expoases all the ports
+***** Notes Incomplete
+
+# Grafana Introduction
+- Multi platform opensource analytics and interactive visualization  web application 
+- provides charts/Graphs/Alerts
+- Feature of Grafana: 
+	- Has many visualization options
+	- Seemlessly define alerts when it make sense - while you are in the data
+	- Hundreds of dashboards & plugins in the official library
+	- Share data & dashboards across teams
+	- Supports multiple databases, naitively
+
+# Installation of Grafana
+- Installing on windows
+Installing Grafana on Windows
+
+You can install Grafana on Windows using either the Windows installer or the standalone Windows binary. The default Grafana port is 3000, but you can change it if needed.
+
+Method 1: Using the Windows Installer
+
+Navigate to the Grafana download page.
+
+Select the Grafana version you want (latest is selected by default).
+
+Choose Enterprise or Open Source edition.
+
+Click Windows and then Download the installer.
+
+Open and run the downloaded installer.
+
+Method 2: Using the Standalone Windows Binary
+
+Navigate to the Grafana download page.
+
+Select the desired Grafana version and edition.
+
+Click Windows and then Download the zip file.
+
+Right-click the downloaded file, select Properties, check Unblock, and click OK.
+
+Extract the ZIP file to any folder.
+
+Open the bin directory and run grafana-server.exe from the command line.
+
+Optional: Change the Default Port
+
+Open the conf directory and copy sample.ini to custom.ini.
+
+Edit custom.ini and uncomment the http_port option.
+
+Change the port to 8080 or another available port.
+
+Running Grafana
+
+Start Grafana by running grafana-server.exe from the bin directory.
+
+Open your browser and go to http://localhost:3000/ (or your custom port).
+
+Follow the on-screen Getting Started instructions.
+
+Run as a Windows Service (Optional)
+
+Download NSSM.
+
+Use NSSM to add grafana-server.exe as a Windows service.
+
+Default username:admin
+Default password: admin
+
+- on Ubuntu
+	sudo apt-get update
+	sudo apt-get install -y apt-transport-https wget gpg
+	sudo mkdir -p /etc/apt/keyrings
+	wget -q -O /etc/apt/keyrings/grafana.key https://apt.grafana.com/gpg.key
+	echo "deb [signed-by=/etc/apt/keyrings/grafana.key] https://apt.grafana.com stable main" | sudo tee /etc/apt/sources.list.d/grafana.list
+	sudo apt-get update
+	sudo apt-get install grafana
+	sudo systemctl daemon-reload
+	sudo systemctl start grafana-server
+	sudo systemctl status grafana-server
+	sudo systemctl enable grafana-server
+
+- Configurations for connecting datasources
+	- Connections > datasources>add new data source > prometheus>add prometheus serverurl (http://localhost:9090)>save&test
+
+# Prometheus configuration
+- configuration is stored in a yaml file format
+- it can be changed and applied without having to restart prometheus
+	- a reload can be done by executing kill-SIGHUP <pid>
+- we can also pass parameters (flags) at stratup time to ./prometheus
+- to scrape metrics need to add configuration to prometheus config file
+- open prometheus.yaml file (contents as below0
+-------------------------------------------------------
+promethues.yaml
+-------------------------------------------------------
+# my global config
+global:
+  scrape_interval: 15s # Set the scrape interval to every 15 seconds. Default is every 1 minute.
+  evaluation_interval: 15s # Evaluate rules every 15 seconds. The default is every 1 minute.
+  # scrape_timeout is set to the global default (10s).
+
+# Alertmanager configuration
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets:
+          # - alertmanager:9093
+
+# Load rules once and periodically evaluate them according to the global 'evaluation_interval'.
+rule_files:
+  # - "first_rules.yml"
+  # - "second_rules.yml"
+
+# A scrape configuration containing exactly one endpoint to scrape:
+# Here it's Prometheus itself.
+scrape_configs:
+  # The job name is added as a label `job=<job_name>` to any timeseries scraped from this config.
+  - job_name: "prometheus"
+
+    # metrics_path defaults to '/metrics'
+    # scheme defaults to 'http'.
+
+    static_configs:
+      - targets: ["localhost:9090"]
+       # The label name is added as a label `label_name=<label_value>` to any timeseries scraped from this config.
+        labels:
+          app: "prometheus"
+    scrape_native_histograms: true
+----------------------------------------------------------------------
+----------------------------------------------------------------------
+notes: alerting target is commented out, uncomment
+how to send alerts configure in rule_files
+
+- read configuration documentation or better understanding
+
+# Exploring the Basec Querying Prometheus
+http://localhost:9090/graph
+***** notes incomplete
+
+# Monitoring the infrastrucyure using prometheus
+- Node exporter should be installed inside machines (for which monitoring is required)	 (Node Exporter : for Linux machines)
+- on window -WMI Exporter
+- Node exporter - which exposes the machines metrics of the linux machines
+??? windows machine vs windows server

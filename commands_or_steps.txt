@@ -1,0 +1,47 @@
+Graffana
+Prometheus
+Application server
+Loki
+
+########## Virtal machine setup using vagrant
+vagrant init <boxname>
+vagrant up
+vagrant ssh
+vagrant halt
+vagrant destroy
+
+
+Ubuntu
+list of packages installed
+apt list --installed
+apt list --installed | grep package_name
+
+
+apt show grep
+
+###### Install pip
+python3 --version
+sudo apt update
+sudo apt install python3-pip
+pip3 --version
+
+pip3 install pandas
+pip3 show pandas
+
+############## SYSTEMctl commands
+# List all actively running services
+systemctl list-units --type=service --state=running
+
+
+##### Grafan service starting
+https://grafana.com/docs/grafana/latest/setup-grafana/start-restart-grafana/
+
+### nstall Grafana using a deb package - ubuntu
+https://grafana.com/grafana/download
+
+
+# uninstall grafana
+sudo apt-get remove grafana-enterprise
+
+# echo "line 1" >>file.txt
+# echo "line 2" >>file.txt

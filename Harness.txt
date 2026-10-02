@@ -1,0 +1,45 @@
+Harness
+Self-Paced Training - Platform Fundamentals
+delegates : communicate outbound only to harness manager
+DELEGATES:
+->project settings-->delegates-->install adelegate-->deligate name-->mylocalserver-->harness helm chart repo to local helm registry-->helm repo update harness-delegate-->copy delegate installation command-->Harness UI-->back to mylocalserver-->Harness UI-->verify delegate connection to Harness manager-->Done
+
+CONNCTORS:
+-Centralized authentication
+-Credential management
+Kubernetes connector
+Project settings-->cnnetors-->New connector-->kubernetes cluster-->Name(k8s-connector)-->continue-->use the credentials of a specific harness  delegate-->continue-->select delegate-->save & continue-->Finish
+
+PIPELINE STUDIO:
+icons : Stages & steps, input steps, triggers, variables
+YAML editor with linting
+-->Pipelines-->create pipelines-->Name-->how do you want to setup your pipeline-inline-->start-->add stage-->Build-->Stage Name-->clone code  base-->select git provider-Harness code repository-->Repository-chose repo-->setup stage-->Infrastructure-->Harness cloud-->continue-->add step-->add step-->Run-->Name (install dependecies)-->shell- bash-->command (cd orientation /safe-cracker && npm install)-->apply changes--> add setp-->add step-->run-->shell(sh)-->Name (build app)-->command (cd orientation /safe-cracker && npm run build)-->apply chnages-->add step-->add setp-->Build and push an image to docker-->Name (build and push to harness AR)-->Registry type-Artifact registry-->Registry - select a registry-->Image Name -Safe cracker-->Tags (0.0.1)-->Optinal configuration-->Base image connector-Docker hub harness auth-->Docker file (orientation/safe-cracker/Dockerfile)-->Apply changes-->Save-->Run-->Run pipeline
+go to harness ui--> registry check image
+
+ENVIRONMENT: Where to build/deploy ( Dev, QA, Production)
+INFRASTRUCTURE: How in the environment (kubernetes cluster, EC2, on prem)
+SERVICES: What you deploy
+
+Harness UI-->deployments-->services-->New Service-->Name (SafCracker)-->How do you want to setup the service-inline-->Save-->service definition-kubernetes-->Manifests-add manifest-->K8s manifest-->continue-->specify k8s manifest store-Harness code-->continue-->Manifet identifier (safecracker)-->Repository name (
+
+Stpes Breakdown:
+1.Deploy helm base delegate into k8s cluster (student34....)
+download, install, register delegate in local
+2.Connectors (k8s-connector)
+create a kubernetes connector -select delegate (student34...)
+3.Pipeline studio
+Stage-build-select git repo-infrastructure-Add steps(execution)-installed dependencies , then run code to generate image -used build image connector - DockerHub-Harness-Auth??
+
+QUESTIONS:
+What are kubernetes based delegates & Docker based delegates
+
+DOCS:
+https://www.youtube.com/watch?v=Krij2upXRfw&t=838s
+https://developer.harness.io/docs/platform/get-started/onboarding-guide
+https://developer.harness.io/docs/continuous-integration/get-started/overview
+https://developer.harness.io/docs/continuous-delivery/get-started/key-concepts
+https://www.youtube.com/watch?v=QCgxBU5If5s
+
+
+
+con style job

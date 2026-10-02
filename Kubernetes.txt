@@ -1,0 +1,340 @@
+Kubernetes
+>>kubectl run hello-minikube
+>>kubectl cluster info
+>>kubectl get nodes
+
+CLI tools :ctr, crictl, nerdctl
+container runtimes other than docker ??rkt
+Container runtime interface (CRI)--to accomodate other container runtimes
+OCi : Open container initiative- image spec & runtime spec
+docker wasnt built to support cri standard hence kubernetes introduced dockershim
+now contianerd is seperate runtime from docker
+dockershim removed since containerd is runtime for docker
+docker is removed from kubernetes support not continerd
+conatinerd can be installed seperately not required to install docker
+containerd comes with CLI tool ctr
+ex. commands
+>ctr
+>ctr images pull docker.io/library/redis:alphine
+>ctr run docker.io/library/redis:alphine redis
+
+contained used as debugging tool, not userfriendly
+alternate, nerdctl
+>docker                                        ---> nerdctl
+>docker run --name redis redis:alphine         ---> nerdctl run --name redis redis:alphine
+>docker run --name webserver -p 80:80 -d nginx ---> nerdctlrun --name webserver -p 80:80 -d nginx
+
+alternate, crictl
+developed and maintained by kubernetes community (again used for debugging purposes)
+works along with kubectl
+kubectl - resp. specific number of containers or pods are available on a node at any time
+>crictl
+>crictl pull busybox
+>crictl images
+>crictl ps -a
+>crictl exec -i -t 3e02.... ls
+>crictl log 3e02...
+>crictl pods
+chart docker cli vs crictl
+containerd an be used as runtime on its own seperate from docker
+single pod can have multiple containers (not same type of container)
+?? how to make two or more container part of the same pod
+containers in same pod can easily iteract as they are in same network & they can share same storage space
+multi-pod containers are rare use cases(ex. multiple containers in same pod)
+
+>kubectl run nginx --image=nginx #creates pod & deploys an instance of nginx docker image
+
+ #on which node and how many replicas
+>kubectl get pods #list of pods in the cluster
+
+how to make service accesible to end users #networking & services
+YAML to create and configure kubernetes object. kubernetew objects???
+pods/replicas/deployments/services
+how to configure a yaml file for pods
+yaml -configuration file
+##################################
+pod-definition.yaml
+apiVersion:
+kind:
+metadata:
+
+
+spec:
+##################################
+apiVersion : version of the kubernetes api we are using to create the object
+kind/apiVersion: Pod/Service-->v1, ReplicaSet/Deployment-->apps/v1
+##################################
+pod-definition.yaml
+apiVersion: v1
+kind: pod
+metadata:
+  name: myapp-pod
+  labels 
+    app: myapp
+    type: fron-end
+
+
+spec:
+  containers:
+    - name: nginx-continer
+      image: nginx
+
+>kubectl ctreate -f pod-definition.yaml
+>kubectl get pods
+>kubectl describe podmyapp-pod
+
+##################################
+vi editor and nano editor
+lab terminals
+terminal -linux or git 
+docker host- docker
+kubernetes control plane - kubernetes
+?? when multiple number odf pods are eploye, how are the distributed among workers (how many max pods per node)
+
+>kubectl config get-contexts
+
+?? how to check pods in a perticular namespace in kubernetes
+>kubectl get pods --namespace default
+>kubectl describe pods
+>kubectl describe pods webapp
+>kubectl delete pods webapp
+>kubectl edit pod redis #edit the specification and save (shift+z+z)
+
+
+
+
+
+
+
+
+
+
+
+############################################################################################################
+#### Config maps ####
+A ConfigMap in Kubernetes is an API object used to store non-confidential data in key-value pairs. It allows you to decouple environment-specific configuration from your container images, making your applications easily portable. ConfigMaps can be consumed by Pods as environment variables, command-line arguments, or as configuration files in a volume.
+
+#### Rolling Update in Kubernetes ####
+A rolling update in Kubernetes allows you to update your application without any downtime by incrementally replacing old Pods with new ones. This ensures that your application remains available to users throughout the update process.
+
+
+???? How to decide resources (in kubernetes manifest file)
+######### FROM DEVOPS COURSE
+
+Container orchastration tools - Docker swarm, k8s, Mesosphere marathon (apache), AWS ECS & EKS, AKS, GKE, Openshift
+Master node - orchastrator
+CNCF
+istio controller- IBM
+?? docker container  and docker container runtime
+not required to login to master-just use some clients to connect
+master node is also called control plane
+Services running-
+	on worker nodes- kubectl, proxy, docker engine
+	master node- API Sever(pods, service,depl), scheduler,conroller manager, ETCD storage
+kubectl cli to connect to kube api server
+pod gives resources to containers
+other containers are just helper containers
+minikube-one node cluster
+KOPS?
+
+
+###### SECTION : Helm ########
+?? pv & pvc (persistent volume claim)
+?? word press site
+secretes to store admin passwords
+?? periodic backups
+?? persistent volume is 20gb but out website needs more
+when we need to upgarade some component of app ==> all yaml file to be checked and elevant changes to be done is tedious
+
+>helm install <app_name>
+>help upgrade <app_name>
+>helm rollback <app_name>
+>helm uninstall <app_name>
+
+>cat /etc/*release*
+helm installation downloads from documentation - 
+>helm --help
+>helm env  	#to get helm client environment information
+>helm version
+--debug flag to enable verbose output
+
+### Helm concepts
+step 1. convert all .yaml files to templates where the values becomes variables ==> two curly braces ex. {{ .Values.image }}
+step 2. define all variables in values.yaml
+templates + values.yaml==> helm chart
+step 3. chart.yaml ==> information about the chart
+
+https://artifacthub.io/ ==>repository of helm charts uploaded by others
+>helm search hub wordpress
+other famous repositories ++> binomi
+>helm repo add bitnami https://charts.bitnami.com/bitnami 	#adds bitnami chart repo to control plane node
+>helm search repo wordpress 	#to search for the helm chart from the downloaded repository
+>helm repo list 	#displays existing repos in the local system
+
+once chart is found from search
+>helm install [release-name] [chart-name] 	#everytime chart is installed, it is a new version
+>helm install release-1 bitnami/wordpress 	#next time use release-2, rlease-3 etc
+each release is completely independent of each other
+
+helm commands
+>helm list 	#list installed packages
+>helm uninstall my-release
+>help pull --untar bitnami/wordpress	#only download a chart but not install 
+>ls wordpress
+>help install release-4 ./wordpress
+??drupal
+>helm install bravo bitnami/drupal 	#release name = bravo
+>helm list #to confirm installation of chart
+uninstall package
+>helm uninstall bravo	#bravo is release name
+# to search whil using vim or vi tool ==> type /
+??nodeport
+
+##### Section : Multi container pods #######
+micro services - decoupling large monolithic application inot subcomponets
+enables develop and deploy set of independent, small and reusable code
+benefit--> scaleup/down, modify each service as required
+some scenarios we may need to couple two or more services(microservices) ex- main app + webserver
+this is for two functionalities work together not to couple them 
+both share the same lfe cycle
+no need to establish volume sharing or services between pods to establish communication between them
+How to create??
+just add as many containers as required in yaml under containers section of sepc
+###Sub Section : multi container pods design pattern
+1.co-located containers : 2 containers running in the same pod, when 2 services are dependent on each other
+2.init container (regular init container) : when there are initilization steps to be performed before pod starts main application ex. databse to be ready before starting the main application
+init container stops
+3. side car container : ex.log shipper of sorts that needs to be run along with main app 
+sid car conatiner continues to run / ends after main app ends
+
+?? difference between 1 & 3 ==> 1-both starts together 2.side car starts first but ends last
+
+initcontainer ex.second conatiner to be defined in spec.containers
+initContainers:
+- name: db-checker
+  image: busybox
+  command: 'wait-for-db-to-start.sh'   	#??
+
+sidecarcontainer ex.second conatiner to be defined in spec.containers
+initContainers:
+- name: log-shipper
+  image: busybox
+  command: 'setup-log-shipper.sh'   	#??
+  restartPolicy: Always
+
+To modify and running pod definition
+>kubectl get pod red - o yaml > red.yaml
+>kubectl delete pod red
+>vi red.yaml
+>kubectl apply -f red.yaml
+##### Section : observability #######
+###Sub Section : Readyness and liveness probes
+readyness test:
+	Web server : HTTP test
+	Databse: TCP test
+	exec command test
+readinessProbe:
+  httpGet:
+    path: /api/ready
+    port:8080
+  initialDelaySeconds: 10
+  periodSeconds: 5
+  failureThreshold: 8
+
+readinessProbe:
+  tcpSocket
+    port:3306
+
+readinessProbe:
+  excec
+    command:
+      - cat
+      - /app/is_ready
+
+###Sub Section : liveness probes
+periodic check of container readyness	
+livenessProbe:
+  httpGet:
+    path: /api/healthy
+    port: 8080 
+  initialDelaySeconds: 10
+  periodSeconds: 5
+  failureThreshold: 8
+
+livenessProbe:
+  tcpSocket
+    port: 3306
+
+livenessProbe:
+  excec
+    command:
+      - cat
+      - /app/is_healthy
+
+
+###Sub Section : logging
+>kubectl logs -f event-simulator-pod
+>kubectl logs webapp-1
+###Sub Section : Monitor & debug applications
+Monitoring kubernetes cluster components
+
+
+##### Section : POD Design#######
+###Sub Section : Labels, selectors & annotations
+metadata:
+  labels:
+    app:App1
+    function:front-end
+>kubectl get pods --selector app=App1
+>kubectl get pods --selector env=dev
+>kubectl get pods --selector env=dev | wc -l
+if it is returening headers try below two
+>kubectl get pods --selector env=dev --no--headers
+>kubectl get pods --selector env=dev --no--headers | wc -l
+>kubectl get pods --selector bu=finance --no--headers | wc -l
+
+>kubectl get all --selector env=prod --no-header | wc -l
+>kubectl get all --selector env=prod,bu=finance,tier=frontend
+###Sub Section : Rolling updates & rollbacks in deployments
+each upgrade of deployment creates new Revision and pod version
+>kubectl get rollout status deployment/myapp-deployment  	#last part deployment name
+>kubectl rollout history deployment/myapp-deployment
+rolling update - update deployments one after one instead of destroying all and adding new ones
+rolling update - default deployment strategy in kubernetes
+after making changes in deployment.yaml ex.
+spec:
+  spec:
+    containers:
+    - name: nginx-container
+      image: nginx: 1.7.1
+>kubectl appy -f deployment-definition.yaml
+rollback in case of issues
+>kubectl rollout undo deplyment myapp-deployment
+>kubectl get rs 	# highloghts old replicasets being made rs# new replica set made 0
+
+Solution:
+1.
+>alias	#to list aliases of kubectl
+alias k='kubectl
+alias kubectl='k3s kubectl'
+alias vi='vim'
+
+3.script names curl-test.sh sends multiple user requests
+8. > kubectl set image deployment frontend simple-webapp=kodecloud/webapp-color:v2
+11.recreate
+>kubectl edit deploy frontend  # change type :recreate under strategy
+>k describe deploy frontend
+
+###Sub Section : Updating a deployment
+###Sub Section : Deployment strategy - blue, green
+deployment strategies:
+1.Recreate
+2.Rolling update
+3.Blue/Green update #old version-Blue, new version-Green, 
+4.Canary update
+###Sub Section : Deployment strategy - canary
+###Sub Section : Jobs
+###Sub Section : CronJobs
+
+
+

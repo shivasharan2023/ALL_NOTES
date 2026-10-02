@@ -1,0 +1,145 @@
+**************************
+jenkins@2026
+**************************
+**************************
+How to logout from SSHed machine : logout
+**************************
+git hub source code URL : https://github.com/imnowdevops/ddc-material/blob/master/15.CI-Jenkins/CI-Jenkins.pdf
+?? difference cont. delivery vs cont. deployment
+?? what is CI
+Jenkins is build on java,needs jdk installed 
+https://www.jenkins.io >>documents >> Installa >>ubuntu
+imp - change openjdk-21-jre to jdk
+jre- java runtime environment - used to run java software
+jdk - to develop software
+jenkins is web based tool
+ls -ld --> o/p -->drwxr-xr-x ???
+batch commands for windows
+shell commands for Linux
+
+######## Commands to install jenkins on EC2 instance
+
+Run below commands through EC2 user data
+#Install java
+#!/bin/bash       #without this script will not run on aws)
+sudo apt update
+sudo apt install fontconfig openjdk-21-jdk -y
+java -version
+
+# Long Term Support release
+sudo wget -O /etc/apt/keyrings/jenkins-keyring.asc \
+  https://pkg.jenkins.io/debian-stable/jenkins.io-2026.key
+echo "deb [signed-by=/etc/apt/keyrings/jenkins-keyring.asc]" \
+  https://pkg.jenkins.io/debian-stable binary/ | sudo tee \
+  /etc/apt/sources.list.d/jenkins.list > /dev/null
+sudo apt update
+sudo apt install jenkins -y
+#############################################################
+1.AWS EC2 launch
+--> Network setttings --> Edit --> firewall security groups -->
+	--> create security group --> security group name (ex. jenkins-SG)
+	--> inbound security group rules -->type - ssh --> source type - My IP
+	-->add security group rule (to access from web) --> port range - 8080 (jenkins listens on 8080)
+	--> source type - MyIP
+	--> advanced details --> user data - copy the jenkins installation commands
+	--> launch ec2
+once launched copy the public IPv4 adress (required for SSHing into it)
+######################################################################
+2.open git bash or terminal
+git bash
+>>ssh -i <path-to-key-pair> ubuntu@<public-ipv4 adress>
+>>sudo -i	#switch to root user
+>>java -version #if version and other details not shown run the installation commands one by one manually
+
+>>systemctl status jenkins	#to check jenkins server running status
+>>q
+
+>>ls /var/lib/jenkins/		#jenkins home directory #data from here to moved to other system if you want to switch to other system
+>>id jenkins	#jenkins user
+>>ls -ld /var/lib/jenkins		#above user owns this folder
+
+3.Browser
+open --> public_ipv4_adress:port (ex. 34.224.101.105:8080)
+-get the default password available in the path (cat)
+-select pluggins to install -->build features - uncheck-Ant, check-nodeJs --> install 	
+	-->set username & password, give fake email address (admin@ops.com) --save & continue
+	-->jenkins URL - remove replace ip with some fake url ex. jenkins.hkh.xyz --> save -->start using jenkins
+-click on settings to explore options (to manage jenkins)
+-background them settings under profile (rhigh top)
+######################################################################
+			<sub-section> Jobs in Jenkins <sub-section>
+
+jobs in jenkins : freestyle vs pipeline as a code
+jobs : workloads (synonemous to bash scripts concept)
+freestyle : Graphical jobs, not reccomonded fro real time practical jobs, since we need devops jobs as code
+pipeline as a code : written in groovy language, can be versioned
+######################################################################
+<sub-section> Installing tools in jenkins <sub-section>
+Maven for V profile project
+Maven3.9 requires JDK17
+?? What is MAVEN
+jenkins is just a front end -- tools we menstion should be available on system ex. git
+-->settings-->tools-->
+-->Maven installations-->addmaven-->Name -(ex.MAVE3.9)
+-->select install automatically
+-->version - select 3.99
+-->JDk installations__add JDK --> name : JDK17--> JAVA_HOME :path to JDK 17 on system (ex./user/lib/jvm/java-17-openjdk-amd64 install JDK17 on system & get the path see below code)
+with this MAVEN/JDK/git are set (go to system and check whether all these are available)
+
+
+
+Install JDK17 on system
+>>java --version
+>>ls /user/lib/jvm
+>>apt install openjdk-17-jdk -y
+>>ls /user/lib/jvm 		#required path from output - ex.: /usr/lib/jvm/java-17-openjdk-amd64
+
+Check JDK17/git/MAVEN installed?
+>>git --version
+>>java --version
+>>mvn --version
+>>apt install maven 	#if not installed
+######################################################################
+<sub-section> First Job <sub-section>
+jenkins home page --> New item -->name : FirstJob --> select an item -> Frrestyle project->ok
+--> General->Description : Learning jenkins job->  Build steps : execute shell (these will be available if plugins installed)
+-->command : whoami  pwd   w   id   (note: on seperate lines) --> Save
+-->Build now (lef side panel) --> results of execution apear below
+
+Jenkins jobs run in users privilage
+to check perform below steps
+-->Configure -> build steps : execute shell--> command : sudo apt update -->build now  (thos job will fail)
+
+-->configure-->build steps: execute shell --> command : cat /proc/cpuinfo > cpuinfo.txt    ls -ltr    pwd (on seperate lines)
+-->workspace(left panel) --> check the file cpuinfo.txt
+--Workspace-->wipe out current workspace
+
+-->configure --> post build options--> add post build action -->archive the artifacts-->files to archive :  **/*.txt (note : ** means recursively)--> Save -->build now
+--> check in workspace
+
+######################################################################
+<sub-section> First Build job <sub-section>
+Rquire: git, JDK, Maven
+
+-->settings-->tools-->java installation -->add jdk-->add JDK17 and path if not available
+-->add jdk -->name: JDK21--> JAVA_PATH : /usr/lib/jvm/java-21-openjdk-amd64
+-->maven installations--> add 3.99 and 3.914 ( steps shown in pevieous section)
+
+-->Jenkins main page-->new item-->item name : vprofile build -->free style project-->ok--: Description : vprofile build job using JDK and maven --> JDK : choose JDK 17--> Source code management : git -->url : https://github.com/hkhcoder/vprofile-project.git-->branches to build --> branch specifier : */electron
+-->build steps-->add build steps-->invoke top-level maven -->selct maven version -->goals :install-->post build actions-->addpostbuildaction : archive the artifacts
+->files to archive --> **/*.war-->save --> build now
+change configuration of build : change maven version to default and run (if fails install default version of maven in system then try, for default version dont specify version of maven)
+
+goal : goal is the arguement passed to maven 
+
+######################################################################
+<sub-section> jenkins agent : Distributed architecture <sub-section>
+Distributed architecture (in jenkins or ci/cd : other computers executing the commands
+connection protocols: SSH, TCP JNLP etc..
+**pending
+
+
+
+
+
+	

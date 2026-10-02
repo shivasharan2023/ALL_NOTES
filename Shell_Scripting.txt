@@ -1,0 +1,731 @@
+######################### Linux Shell Scripting: A Project-Based Approach to Learning, Udemy-Jason Cannon ####################
+##################################################################################################
+###########################INSTALLATIONS & CONFIGURATIONS#######################################
+*** COnfigurations changed
+1.Disabled Hyper-V and virtual machine platform
+***Installations done
+1.Virtual box
+2.Vagrant
+##################################################################################################
+??UNIX like & Linux-like system
+Difference between VM and containers
+Virtualization allows to run linux on virtual machine on your local desktop/laptop
+virtualization software - VirtualBox (http://virtualbox.org)
+virtalization softawre in production -VMWare, KVM, oVirt
+virt -unmodifed operating system with all of its installed software in a special environment on top of our existing system
+special environment -virtual machine
+pysical machine-host
+virtual machine- guest
+does all operation on virtual disk it has access to 
+vagrant- command line tool(vagrantup.com)
+Vagrant project--> folder + vagrant file
+multi machine setup by vagrant 
+windows does nto ship SSH---. use git
+private network : machines inside the network accessed by only the machines within that network
+SSH, secure shell, is the network protocol used to connect to Linux systems
+Git- ships SSH client with it
+Vagrant requires the "Microsoft Visual C++ Redistributable Package (x64)" to be installed if you are running Windows
+For Mac users, start the Terminal application which is located in the /Applications/Utilities folder
+For Linux users, start your favorite terminal emulator.  Examples include GNOME Terminal, Konsole, and xterm
+Add a Box to Vagrant- A "box" in Vagrant speak is an operating system image
+windows home directory --> "C:\Users\jason"
+MAc--> "/Users/jason"
+Linux --> "/home/jason"
+Vagrant uses the concept of projects
+Windows+R--> run (search box)
+run --> ex. control (for control panel)	
+Disable Hyper-V or Virtual Machine Platform
+control panel-->programs-->Programs & features-->Turn windows features on or off-->uncheck hyper-V
+to download boxes : https://vagrantcloud.com
+
+-------------------------------------------
+cmd
+cd path
+cd E:  (if path is E drive)
+----------------------------------------------
+?? command to check available vagrant boxes on local system
+>>vagrant up ==> brings up default virtual machine
+
+-Processess running in the background upn virtual machine created
+Virtual Box Headless Frontend
+Virtual Box interface
+
+File Explorer (Windows) or the Finder (Mac)
+
+??understand ipconfig output
+
+Mac and Linux
+ping -c 3 10.9.8.7    ??3
+
+??How to check virtual machines configurations specially ram and hard disk
+
+On windows to check ssh client is installed
+cmd>>ssh
+
+??microsoft visual c++ redistribution
+
+?? Architecture ARM64/X86/X64
+
+on linux download files to
+~/Downloads
+
+?? on Linux how to use browser
+
+for user account home directory >su
+>>sh Virtualbox*run
+>>Virtualbox
+>>yum local -y vagrant*rpm
+>>vagrant
+
+Linux all installations to be done on root 
+
+exit from root
+>>exit
+
+Accessing Terminal on MAC
+/applications/utilities/Terminal
+
+Linux
+Terminal emulators -->Terminal console, XTerm
+
+?? virtual box and containers both come with OS, what is the difference
+
+Vagrant init   creates the file Vagrantfile
+
+## Shebang, Naming, Permissions,variables, Builtins
+.sh files extension is not significant on linux
+
+#! /bin/bash ==>what is goint to execute the command (interpretor)==>/bin/bash <file_name>
+similarly
+#! /usr/bin/python
+
+?? vim insret mode/quit mode/quit no save/save & quit
+
+>ls -l ==> explore file permissions
+> chmod 755 luser-demo01.sh==> to change permissions
+==> r=4, w=2, x=1 ==>rwx=7
+>./luser-demo01.sh
+.==> current directory
+
+>mv luser-demo01.sh jsonc ==> renames the file
+
+>touch blah.sh ==>creates empty file or updates the last access timestamp of the file 	
+
+>type echo
+>echo 'hello'
+>type -a echo
+>/usr/bin/echo 'Hello'
+>help echo
+>help echo |less
+
+>uptime ==> how long the system is up
+>type -a uptime
+>help uptime ==> since is not shell built in 
+>man uptime
+
+significance of single quotes and double quotes with echo ==> for variables use double ex. echo "$Word"
+>WORD='name'
+>echo '$WORD'
+>echo "$WORD"
+
+use seperate terminal to execute .sh file during editing instead of exiting and running every time
+>echo "Write your $WORD" ==> >echo "Write your ${WORD}
+>echo "${WORD}ing is neccessory"
+>NEW_WORD="${WORD}ing"
+>echo "$Wording" ==> will not work
+>echo "${WORD}${NEW_WORD}"
+BEST PRACTICE : use variable names as CAPS
+>?is variable reassignment possible
+
+### Special variables, Pseudocode,command substitution, if statement, conditionals
+>cd shellclass
+>cd localusers
+>vagrant up
+>vagrant ssh
+>cd /vagrant
+>vim luser-demo02.sh
+#! /bin/bash
+#display the UID and username of the user executing this script
+# Display if the  user is the root user or bot
+
+# Display the UID
+echo "${UID}"
+# Display the username
+
+# Display if the user is root user or not
+==> save & execute
+>chmod 755 luser-demo02.sh
+>./luser-demo02.sh
+>man bash
+/UID
+N
+/N
+
+What is the difference betwenn UID and EUID
+>?Shell
+>echo "${UID}"
+>UID="1001" 	#Readonly variable
+>type -a id ==> id is /usr/bin/id ==>it is program not shell builtin
+>man id
+# []==>optional
+#... many
+>id -u
+>id -u -n or id -n -u   or id -un
+
+>whoami
+>type -a whomami
+>man whoami
+
+>vi luser-demo02.sh
+#! /bin/bash
+#display the UID and username of the user executing this script
+# Display if the  user is the root user or bot
+
+# Display the UID
+echo "${UID}"
+# Display the username (Add in this step)
+USER_NAME+$(id -un) 	#to store output of a command to a variable
+echo "your username is ${USER_NAME}"
+
+# Display if the user is root user or not
+
+>./luser-demo02.sh
+
+>vi luser-demo02.sh
+replace USER_NAME=$(id -un)  with USER_NAME=`id -un`  # `=tick, using ` is old method
+execute
+
+>vi luser-demo02.sh
+Replace USER_NAME to previous one $()
+# Display if the user is root user or not
+if [[ "${UID}" -eq 0]]
+then
+  echo 'you are root.'
+else
+  echo 'you are not root.'
+fi
+>type -a if
+>help if
+
+other way of representation
+>if [[ "${UID}" -eq 0]]; then echo 'you are root'; fi
+
+>type - [[
+.help [[
+>type -a test
+>help test | less
+>./luser-demo02.sh
+		#sudo -super user do
+>sudo ./luser-demo02.sh
+>su
+>./luser-demo02.sh
+>exit
+
+
+>vi luser-demo02.sh
+>type -a [
+>ls -l /usr/bin/[
+
+## Eixt statuses, return codes, string test conditionals, more special variables
+?? cd /vagrant 	# what is this shared directory of vgrant
+man useradd -- > /exit
+help test --> for -eq -ne -gt -ge -lt -le etc
+
+what is root user uid in linux
+= both assignment and equality test operator
+for variables -->assignment, in tests equality
+== for pattern matching
+
+#==============================================================================================#
+		## SECTION 3: USER AND ACCOUNT CREATION
+#==============================================================================================#
+#==============================================================================================#
+		## SIDE NOTES
+??atom
+#!==>sharp + Bang
+if no shebang==> scipt executed with shell currently being used
+shebang+interpretor
+-rwx-rwx-rwx 1 Vagrant Vagrant ==>O(vagrant)G(vagrant)O
+? use of cd .
+renaming a file
+>mv <name_of_file> <New_name_of_file>
+# create an empty file
+>touch blah.sh 		#if file exists, it updates timestamp
+#echo shell built in meaning it does not require any external program to execute it
+>type echo	#to check shell built-in or not
+>type -a echo 	#also shows path
+>/usr/bin/echo 'Hello'
+>help echo
+>help echo |less	#enables scrolling of the output
+>uptime
+>type -a uptime
+>help uptime		#if no help topic, means it is not shell built-in
+>man uptime 		#to get help for non shell built in commands
+#==============================================================================================#
+# 12.GETTING STARTED WITH SHELL SCRIPTING: NAMING, PERMISSIONS, VARIABLES, BUILS-INS
+# CREATING LOCAL USERS
+>cd shellclass
+>mkdir localusers
+>cd loclusers
+>vagrant init jason/centos7
+>vagrant ssh
+>cd /vagrant 
+>ls -l
+>pwd
+>vim luser-demo01.sh		#file can be edited on virtual machine or on the local machine (/vagrant folder mounted on local machine)
+	#!/bin/bash		#how to use for other interpretors ex. #!/usr/bin/python, #!/bin/ruby
+	
+	# This script displays various information to the screen
+	
+	# Display 'Hello'
+	echo 'Hello'
+
+	# Assign a value to a variable
+	WORD='script'	#no space , - not allowed in var name
+
+	# Display that value using the variable
+	echo "$WORD"		#single quotes prevent expansion of variables
+
+	# Demonstrate that single quotes cause variables to not get expanded
+	echo '$WORD'
+
+	# Combine the variable with the hard-coded text
+	echo 'This is a shell $WORD'
+
+	# Display thecontents of the variable using an alternative syntax
+	echo 'This is a shell ${WORD}'
+
+	# Append text to the variable
+	echo '${WORD}ing is fun!'
+	
+	# Show how not to append text to a variable
+	# This does not work:
+	echo "$WORDing is fun!"
+
+	# Create a new variable
+	ENDING='ed'
+	
+	# Combine the two variables
+	echo "This is ${WORD}${ENDING}." 
+
+	# Change the value stored in the variable "ENDING". (Reassignment.)
+	ENDING='ing'
+	echo "${WORD}${ENDING} is fun!" 
+
+	# Reassign value to ENDING.
+	ENDING='s'
+	echo "you are goint to write many ${WORD}${ENDING} in this class!"
+
+	# press 'esc'-->":wq" to save the file
+>chmod 755 			# read = 4, write = 2, and execute = 1
+>ls -l
+>./luser-demo01.sh
+===============================================================================================
+# 13.SPECIAL VARIABLES PSUEDOCODE, COMMAND SUBSTITUTION, IF STATEMENT, CONDITIONALS
+====================================================================================
+#### SIDE NOTES
+??  will vim create file if it does not exist?
+psuedocode-->write the steps (commented lines) about the task to be accomplished
+shells==> bash, csh(c shell), ksh(kornshell)
+?? from where var UID is comes ==>
+>man bash	# type '/UID' & execute  # press"N" to move to next occurance #type '?Shell' --> to search for shell  # q to quit  
+?? difference between UID and EUID
+for security reasons scripts are not allowed to set UID
+#UID is read-only (try below test)
+>echo "${UID}" 
+>UID="1001"		# notice single quotes 	# How to check type of the variable
+>type -a id 		# id--> displays username -->it is a program, not shell built-in
+>man id 
+>id
+>id -u 	#User ID
+>id -u -n 	#username
+>id -n u 	# does not make difference
+>id -nu		# optionas can be clubbed
+>whoami		# alternative to get username
+>type -a whoami
+>man whoami
+>USER_NAME=$(id -un) #or USER_NAME= `id -un` #this is older syntax
+>echo "$USER_NAME" 
+[ -> bracket
+>type -a if
+>help if 
+; or new line in terminal ,command seperator, example to execute a if command
+>type - [[
+>help [[
+[[ is for bash, it may not work for other shells
+>type -a test
+>help test | less	#q to exit
+root UID is 0
+>type -a [
+>ls -l /usr/bin/[		#it is a file
+====================================================================================
+>cd shellclass
+>cd localusers
+>vagrant up
+>vagrant ssh
+>cd /vagrant
+>vim luser-demo02.sh
+	#!/bin/bash
+	
+	# Display the UID and username of the user executing this script.
+	# Display if the user is root user or not.
+
+	# Display UID.
+	echo "Your UID is ${UID}"
+
+	# Display username.
+	USER_NAME=$(id -un)	#to store output of a command to a variable
+	echo "Your username is ${USER_NAME}"
+
+	# Display if the user is root user or not.
+	if [[ "${UID} eq 0" ]]		#notice spaces # [-> can also works
+	then
+	  echo 'You are root.'
+	else
+	  ech 'You are not root.'
+	fi
+>chmod 755 luser-demo02.sh
+>./luser-demo02.sh
+# execute as root user
+>sudo ./luser-demo02.sh
+#switch to root user and execute
+>su	#asks for password #it is vagrant for the system used by the instructor #how to check it
+>./luser-demo02.sh
+>exit
+# this type of check can be used as sanity check
+
+===============================================================================================
+# 14.EXIT STATUSES, RETURN CODES, STRING TEST CONDITIONALS, MORE SPECIAL VARIABLES
+====================================================================================
+#### SIDE NOTES
+>man useradd	
+>/exit
+>type -a exit
+>help exit
+if exit status is not specified, it is taken from the last execution status
+>help test
+
+>id -un
+>echo "${?}"		#0--> success, non zero- non success
+
+>id -unx
+>echo "${?}" 
+====================================================================================
+>cd shellclass
+>cd localusers
+>vagrant up
+>vagrant ssh
+>cd /vagrant
+>vim luser-demo03.sh
+	#!/bin/bash
+
+	# Display the UID and username of the user executing this script.	
+	# Display if the user is the vagrant user or not
+
+	# Display the UID.
+	echo "Your UID is ${UID}"
+
+	# Only display if the UID does not match 1000.
+	UID_TO_TEST_FOR='1000'
+	if [[ "${UID}" -ne "${UID_TO_TEST_FOR}" ]]
+	then
+	  echo "Your UID does not match "{UID_TO_TEST_FOR}."
+	  exit 1
+	fi
+
+	# Display the username.
+	USER_NAME=$(id -un)	
+
+	# Test if the command succeeded.
+	if [[ "${?}" -ne 0 ]]
+	then 	
+	  echo 'The id command did not execute successfully'
+	  exit 1
+	fi
+	echo "Your username is ${USER_NAME}"
+
+	# You can use a string test conditional.
+	USER_NAME_TO_TEST_FOR='vagrant'
+	if [[ "${USER_NAME}" = "${USER_NAME_TO_TEST_FOR}"		# '=' for match, '==' for pattern match ??
+	then
+	  echo "Your username matches "${USER_NAME_TO_TEST_FOR}."
+	fi
+
+	# Test for != (not equal for the string)
+	if [[ "${USER_NAME}" != "${USER_NAME_TO_TEST_FOR}"		
+	then
+	  echo "Your username does not matche "${USER_NAME_TO_TEST_FOR}."
+	  eexit 1
+	fi
+
+	exit 0
+>chmod 755 luser-demo03.sh
+>./luser-demo03.sh		#test once for upto if statement ==> then >sudo ./luser-demo03.sh
+>sudo ./luser-demo03.sh
+>echo "${?}" 
+
+===============================================================================================
+# 15.READING STANDARD INPUT, CREATING ACCOUNTS, USERNAME CONVENSTIONS, MORE QUOTING
+===============================================================================================
+#### SIDE NOTES
+>type -a read
+>help read | less		#q to exit
+>read -p 'Type something : ' THING		#input "something"
+>echo "${THING}"
+
+>man useradd
+>sudo useradd dougstamper
+>sudo su - dougstamper
+>ps -ef
+>exit
+>man useradd	#check -c option, -m option
+>/CONFIGURATION
+
+>passwd
+>man passwd		#check -stdin option, -f option, -e option
+====================================================================================			
+>cd shellclass
+>mkdir localusers
+>cd loclusers
+#>vagrant init jason/centos7
+>vagrant ssh
+>cd /vagrant
+>vim luser-demo04.sh
+	#!/bin/bash
+		 
+	# This script creates an account on the local system.
+ 	# You will be prompted for the account name and password.
+
+	# Ask for the username.
+	read -p 'Enter the username to create:' USER_NAME
+
+	# Ask for the real name.
+	read -p 'Enter the name of the person who this account is for:' COMMENT
+
+	# Ask for the password.
+	read -p 'Enter the password to use for the account:' PASSWORD
+
+	# Create the user.
+	useradd -c "${COMMENT}" -m "${USER_NAME}"
+
+	# Set the password for the user.
+	echo ${PASSWORD} | passwd --stdin ${USER_NAME}
+
+	# Force password change on first login.	
+	passwd -e ${USER_NAME}
+>chmod +x luser-demo04.sh
+>sudo ./luser-demo04.sh  #provide username input jsmith, name of the person as jane smith, password jsmith123
+>su - jsmith
+>exit
+
+***********
+********** IMP: EXERCISE PENDING
+
+#==============================================================================================#
+		## SECTION 4: PASSWORD GENERATION & SHEL SCRIPT ARGUEMENTS
+#==============================================================================================#
+===============================================================================================
+# 18.RANDOM DATA, CRYPTOGRAPHIC HASH FUNCTIONS, TEXT AND STRING MANIPULATION
+===============================================================================================
+#==============================================================================================#
+		## SIDE NOTES
+>man bash
+>/random
+>echo "${RANDOM}"
+>!v	#??
+>!.
+
+>man date
+>/FORMAT  	# check for %s
+>date +%s
+>!m	#for last executed command starting m
+>/nano 	#search for nano seconds
+>date +%s%N
+>cat sha1sum.txt
+>sha1sum CentOS-7-x86_64-Minimal-1611.iso
+>cat sha256sum.txt
+>sha256sum CentOS-7-x86_64-Minimal-1611.iso
+>echo "1">>CentOS-7-x86_64-Minimal-1611.iso
+>sha256sum CentOS-7-x86_64-Minimal-1611.iso	#does not match original sha256sum
+>ls -l /usr/bin/*sum
+
+>date +%s
+>date +%s | sha256sum 	#passing date output to sha256sum to generate number
+>man sha256sum
+>type -a head
+>man head
+>head -n1 /etc/passwd
+>head -n 1 /etc/passwd 	#same output
+>head -1 /etc/passwd	#same output, old method
+>head -2 /etc/passwd
+>head -c1 /etc/passwd
+>head -c2 /etc/passwd
+>echo "testing" | head -c2
+>date +%s | sha256sum | head -c8	#run couple of times & observe
+>date +%s%N | sha256sum | head -c8
+
+>S='!@#%$%^&*()_-+'
+>echo "${S}"		#how to extract one character from it randomly
+>man shuf
+>shuf /etc/password
+>man fold
+>echo "${S}" | fold -w1
+>echo "${S}" | fold -w1 | shuf
+>echo "${S}" | fold -w1 | shuf | head -c1
+#==============================================================================================#
+>cd shellclass
+>cd localusers
+>vagrant up
+>vagrant ssh
+>cd /vagrant
+>vim luser-demo05.sh
+	#!/bin/bash
+	
+	# This script generates a list of random passwords.
+
+	# A random number as a password.
+	PASSWORD="${RANDOM}"	
+	echo "${PASSWORD}"
+
+	# Three random numbers together.
+	PASSWORD="${RANDOM}${RANDOM}${RANDOM}"	
+	echo "${PASSWORD}"
+
+	# Use the current data/time as teh basis for password.
+	PASSWORD=$(date +%s)	
+	echo "${PASSWORD}"
+
+	# Use nanoseconds to act as randomization
+	PASSWORD=$(date +%s%N)	
+	echo "${PASSWORD}"
+
+	# A better password.
+	PASSWORD=$(date +%s%N | sha256sum | head -c32)	
+	echo "${PASSWORD}"
+
+	# An even better password.
+	PASSWORD=$(date +%s%N${RANDOM}${RANDOM} | sha256sum | head -c48)	
+	echo "${PASSWORD}"
+
+	# Append a special character to the password.
+	SPECIAL_CHARACTER=$(echo '!@#$%^&*()_-+=' | folde -w1 | shuf | head -c1
+	PASSWORD=$(date +%s%N${RANDOM}${RANDOM} | sha256sum | head -c48)	
+	echo "${PASSWORD}${SPECIAL_CHARACTER}"	
+
+>chmod 755 luser-demo05.sh
+>./user-demo05.sh
+
+===============================================================================================
+# 19.POSITIONAL PARAMETERS, ARGUEMENTS, FOR LOOPS, SPECIAL PARAMETERS
+===============================================================================================
+#==============================================================================================#
+		## SIDE NOTES
+>man bash
+>/PATH
+>echo "${PATH}"
+>which head
+>sudo vim /usr/local/bin-head 	
+	!#/bin/bash
+	echo "Hello from my head!"
+>sudo chmod 755 /usr/local/bin/head
+>which head
+>whihc -a head
+>head
+>/usr/bin/head -n1 /etc/passwd
+>sudo rm /usr/local/bin/head
+>type head
+>head
+>hash -r
+>type head
+>help hash
+>whcih luser-demo06.sh
+>sudo cp luser-demo06.sh /usr/local/bin/
+>whcih luser-demo06.sh
+>luser-demo06.sh
+>./luser-demo06.sh
+>/vagrant/luser-demo06.sh  	#observe output ("you executed this command") in each case
+>sudo rm /usr/loacl/bin/luser-demo06.sh
+
+>man basename
+>basename /vagrant/luser-demo06.sh
+>basename /not/here	#returns her even "not" directory exists 
+>man dirname
+>dirname /vagrant/luser-demo06.sh
+>dirname /this/is/not/here
+>man bash
+>/special parameters
+
+>for X in Frank Claire Dough
+>do
+>  echo "Hi ${X}"
+>done
+
+>man bash
+>/special parameters 		# check "@" special parameter
+>	
+#==============================================================================================#
+>cd shellclass
+>cd localusers
+>vagrant up
+>vagrant ssh
+>cd /vagrant
+>vim luser-demo06.sh
+	#!/bin/bash
+	
+	# This script generates a random password for each user specified on the command line
+
+	#  Display what the user typed on the command line
+	echo "You executed this command: ${0}"		#execute till her and check output
+
+	# Display the path and filename of the script
+	echo " You used $(dirname ${0}) as the path to the script $(basename ${0})script."
+
+	# Tell them how many arguements they passed in.
+	#  (inside the script they are parameters, outside they are arguements.)        	
+	NUMBER_OF_PARAMETERS="${#}"	# "$#"  this also works
+	echo "You passed ${NUMBER_OF_PARAMETERS} arguement(s) on the command line."
+
+	# Make sure they at least supply one arguement.
+	if [[ "${NUMBER_OF_PARAMETERS}" -lt 1 ]]
+	then
+	  echo "Usage: ${0} USER_NAME [USER_NAME]..."
+	  exit 1
+	fi
+
+	# Generate and display password for each parameter.
+	for USER_NAME in "${@}"		#what happens if we use *
+	do 
+	  PASSWORD=$(date +%s%N | sha256sum | head -c48)
+	  echo "${USER_NAME}:${PASSWORD}"
+	done
+
+>chmod 755 luser-demo06.sh
+>./user-demo06.sh
+
+===============================================================================================
+# 20.THE WHILE LOOP, INFINITE LOOPS, SHIFTING, SLEEPING
+===============================================================================================
+#==============================================================================================#
+		## SIDE NOTES
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+****
+pwd

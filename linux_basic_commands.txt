@@ -1,0 +1,96 @@
+Linux administrator
+-Commands
+-Files
+-Softwares (management)
+-Servers (Management)
+Linux - Open source kernel
+Kernel ??
+Kernel + utilities -->OS
+CentOS, ubuntu, Debian, Kali, Red Hat, fedora --> use Linux kernel
+Android phone is Linux
+GUI - difficult in automation, running things in background
+how windows catching up on automation ??
+RHEL - for server, not opensource
+server linux os-RHEL, ubuntu server, centos(open), SUSE EL
+
+best - servers-RHEL
+	automation - ubuntu
+/tmp - files may get deleted on reboot
+/etc - configuration files
+/var,/svrv - server data
+
+>>whoami  #what user you are
+>>pwd 	#present working directory
+>>ls 	#list directory
+>>cat /etc/os-release
+~ -> home directory
+$ user's shell
+# root user's shell
+>>cd / #root directory
+root directory vs root user home directory
+>>cd 	#come back to home directory of user
+>>cd /bin
+absolute path begins with root directory
+>>ls
+/bin- user executable programs
+>>cd /etc/
+>>ls
+>>cd /tmp/
+>>cd /boot/
+>>cd /proc/
+>>uptime
+>>cat /proc/uptime
+>>free -m (RAM details)
+>>exit 	#exit from root user if logged in or nromal user comes back to vagrant
+>>sudo -i 	# switch to root user
+>>exit
+>>mkdir dev
+>>mkdir ops backupdir
+>>ls
+>>pwd
+>>touch testfile1.txt 	#emty file
+>>ls
+>>touch devopsfile{1..10}.txt 	#creates 10 files
+>>ls
+>>cp devopsfile1 dev/
+>>ls dev/ 	#relative path  works since in the current directory
+>>cp /home/vagrant/devopsfile2 /home/vagrant/dev/ 		# absolute path
+>> cd ~ 	#go to home directory
+>>cp -r dev backupdir/ 	#Copy directory
+>>ls backupdir/
+>>ls <abs_path>
+>>cp --help
+>>mv odevopsfile3.txt ops/
+>>ls ops/
+>>mv ops dev/
+>>ls
+>>ls dev
+>>mv testfile1.txt testfile22.txt  	#Renaming
+>>mkdir textdir
+>>ls
+>>mv *.txt textdir/
+>>ls
+>>cd textdir/
+>>rm devopsfile10.txt
+>>mkdir mobile 
+>>ls
+>>rm -r mobile
+>>rm *{1..9}.txt
+>>mkdir testdir{1..5}
+>>rm -r * 	#dangerous
+>>rm prf * 	#dangerous
+		
+
+
+Linux commands
+sudo --> super user do
+>sudo yum update
+>pwd
+ls -l
+lls ll(both same)
+cd ..
+~
+ls
+virtual box
+what is the use of echo
+Q--> on key board (after less)

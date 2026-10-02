@@ -1,0 +1,245 @@
+# DOCKER NOTES/COMMANDS 26/09/2026
+
+- MacOS terminals iTerm2, and ??
+- Linux chose linux shell
+- CLi-->server (deamon)
+
+#check docker is working(docker cli can talk to engine) and its bersion
+>docker version 	 #new version 1.32?
+ 
+
+#get detailed information of docker
+#get details about what are the images, containers running, not running etc
+#config values of the engine
+>docker info
+
+#get the list of available docker commands
+>docker
+
+# STARTING A NEW NGINX WEB SERVER & CHECK WHETHER IT IS RUNNING ON LOCALHOST
+# run nginx container on port 80:80
+>docker container run --publish 80:80 nginx
+
+# run the above in detach mode
+
+#list the containers
+>docker container ls
+
+#stop the whatever containers running
+>docker container stop <container_ID>
+
+#list conatiners, also list all containers (running & stopped)
+>docker container ls -a
+
+#run the nginx container with name "webhost" on port 80:80 in detach mode
+>docker container run --publish 80:80 --detach --name webhost nginx
+>docker container ls -a
+
+#get th logs of the container just started 
+>docker container logs webhost
+
+#get process running in container
+> docker container top webhost
+
+#list the help of docker containers commands
+>docker container --help
+
+#remove the created containers
+>docker rm <cont_ID>
+
+#force remove the contaner if it is running
+>docker container rm -f
+#also check how to stop the running container
+
+</task> explore the Dockerfile of nginx
+?? what is happening or what i can do with the running nginx container
+?? in production how to stop the docker pulling nginx from dockerhub when we run docker run command
+?? how to configure other repository instead of dockerhub
+
+- vm ==> server > HostOS > Hyperviser >guset os>Bins/Libs > app A
+				       >guset os>Bins/Libs > app B
+- Docker ==> server > HostOS > DockerEngine > Bins/Libs > app A
+					    > Bins/Libs > app B
+
+#run mongo container with name mongo 	#what is mongo container
+>docker run --publish 80:80 --name mongo -d mongo
+>docker ps
+# list processes running inside it
+>docker top <cont_name>
+#this process running using HostOS, so list it using ps aux
+>ps aux
+
+#stop the container & verify
+>docker stop <container_name>
+>docker ps
+>docker top <cont_name>
+>ps aux | grep <con_name>
+
+#start the mongo container back, conifrm it is running, check the running process, check the process running on Host
+>docker start <con_name>
+
+# ASSIGNMENT MANAGE MULTIPLE CONTAINERS
+#Managing multiple containers
+#run mysql container, with name=db, detach mode, on port 3306:3306 , MYSQL_RANDOM_ROOT_PASSWORD=yes, image name=mysql
+>docker container run -d -p 3306:3306 --name db -e MYSQL_RANDOM_ROOT_PASSWORD=yes mysql
+>docker container logs db 	#copy generated password
+
+#run container named webserver from httpd image, detach mode, port 8080:80
+>docker container run -d --name webserver -p 8080:80 httpd
+??? tcp
+
+#run container named proxy from nginx image, detach mode, port 80:80
+>docker container run -d --name proxy-p 80:80 nginx
+>docker ps	 	#or docker conatiner ls	#confirm
+>curl localhost
+>curl localhost:8080
+
+#stop all containers
+>docker stop <cont_ID>	#use tab for auto completion
+>docker ps -a 	#confirm
+
+#remove the containers from local
+>docker rm <cond_id>
+
+#similarly remove the associated images from local system
+>docker image ls
+>docker rmi <image_id>
+
+# WHAT IS GOING ON IN CONTAINER (TOP, INSPECT, STATS)
+# start nginx container
+>docker container run -d --name nginx  nginx		?? what happens when ports not specified
+>docker container run -d  --name db -e MYSQL_RANDOM_ROOT_PASSWORD=true mysql
+>docker container top mysql
+>docker container top nginx
+>docker container inspect mysql
+>docker container inspect nginx
+>docker container stats
+
+# GETTING A SHELL INSIDE A CONTAINER: NO NEED TO SSH
+- docker container run -it 	-start new container interactively
+- docker container exec -it 	-run additional command in existing container
+
+# start nginx container named proxy and get the terminal inside it
+# and execute commands 1.ls -al
+# exit out of the shell
+>docker container run -it --name proxy nginx bash	#for ubuntu image default CMD is bash so no need to do -it bsh
+
+>docker container run -it --name ubuntu ubuntu
+>apt-get update
+>apt-get install -y curl
+>curl google.com
+>exit
+>docker container ls
+>docker container ls -a
+>docker container start -ai ubuntu
+>curl google.com
+>exit
+
+# open a terminal inside already running container mysql
+>docker container exec --help
+>docker container exec -it mysql bash
+>ps aux
+>exit
+
+#pull latest alpine image
+>docker pull alpine 
+>docker image ls
+#start apine container with the bash terminal inside it
+>docker container run -it alpine bash		#fails with error, use sh instead of bash
+>docker container run -it alpine sh
+>apk		#apk is the package manager in alpine
+
+# DOCKER NETWORKS: CONCEPTS FOR PUBLIC, PRIVATE COMMS IN CONTAINERS
+-basic TCP/IP networking concepts, such as subnets, IPs and ports and firewalls
+- docker has concept batteries included but removable
+>docker container run -d  -p 80:80 --name webhost nginx	# port expose host port: container port
+>docker container port webhost
+>docker container inspect '{{ .NetworkSettings.IPAddress }}' webhost	#compare with host IP
+
+# DOCKER NETWROKS: CLI MANGAEMENT OF VIRTUAL NETWORKS
+commands discussed
+>docker network ls
+>docker netowrk inspect
+>docker network create --driver
+>docker network disconnect 
+
+commands executed
+>docker network ls 	#lists all the networks that have been created 
+>docker network inspect bridge
+>docker network create my_app_net
+>docker network ls
+??what is network driver
+>docker network create --help
+>docker container run -d --name new_nginx --network my_app_net nginx
+>docker network inspect my_app_net
+>docker network --help
+>docker network connect <network_ID> <container_id>
+>docker container inspect webhost
+>docker network disconnect <network_ID> <container_id>
+>docker container inspect webhost
+
+# DOCKER NETWORKS: DNS AND HOW CONTAINERS FIND EACH OTHER
+>docker container ls
+>docker network inspect <network_ID>
+>docker container run -d --name my_nginx --network my_app_net nginx
+>docker container inspect <network_ID>
+>docker container exec -it my_nginx ping new_nginx
+>docker container exec -it new_nginx ping my_nginx 
+>docker network ls
+>docker container create --help
+
+# ASSIGNMNT: USING CONTAINERS FOR CLI TESTING
+>docker container run --rm -it centos:7 bash
+>yum update curl
+>curl --version
+- shift+d --> opens another terminal
+>docker ps -a
+>docker container run --rm -it ubuntu:14.04 bash
+>apt-get update && apt-get install -y curl 
+>curl --version
+>exit
+>docker ps -a 
+
+***** COMPLETE
+-------------------------------
+# PERSISTENT DATA: VOLUMES, VOLUMES, VOLUMES
+# CONTAINER LIFETIME & PERSISTANT DATA
+?? data volumes and bind mounds
+?? how to preserve database data while replacing containers for databases
+- mounting code into a container fom the host while you are editing it
+data volume: create special location outside the container UFS
+bind mount: sharing or mounting a host directory/file into a container
+
+# DATA VOLUMES
+- check the official latest version of mysql image docker file - and find the command #VOLUME /var/lib/mysql
+- containers cleared whill not clear this volume
+>docker pull mysql
+>docker image inspect mysql		#docker volume prune
+>docker container run -d --name mysql -e MYSQL_ALLOW_EMPTY_PASSWORD=True mysql
+>docker container ls
+>docker container inspect mysql		#check volumes and mount 
+>docker volume ls
+>docker volume inspect <volume_id>
+- mount point directly be located in linux machine
+- but on windows or macos -
+>docker container run -d --name mysql2 -e MYSQL_ALLOW_EMPTY_PASSWORD=True mysql
+>docker volume ls
+>docker container stop mysql
+>docker container stop mysql2
+>docker container ls
+>docker container ls -a
+>docker volume ls
+>docker container rm mysql mysql2
+>docker volume ls			#identification is the issue, better create named volumes
+>docker container run -d --name mysql -e MYSQL_ALLOW_EMPTY_PASSWORD=True -v mysql-db:/var/lib/mysql mysql
+>docker volume ls
+>docker volume inspect mysql-db
+>docker container rm -f mysql
+>docker container run -d --name mysql3 -e MYSQL_ALLOW_EMPTY_PASSWORD=True -v mysql-db:/var/lib/mysql mysql
+>docker volume ls
+>docker container inspect mysql3
+
+>docker volume create --help
+>
+
+# PERSISTANT DATA: BIND MOUNTING

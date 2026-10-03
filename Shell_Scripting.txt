@@ -700,14 +700,259 @@ if exit status is not specified, it is taken from the last execution status
 	done
 
 >chmod 755 luser-demo06.sh
->./user-demo06.sh
+>./luser-demo06.sh
 
 ===============================================================================================
 # 20.THE WHILE LOOP, INFINITE LOOPS, SHIFTING, SLEEPING
 ===============================================================================================
 #==============================================================================================#
 		## SIDE NOTES
+>type -a while
+>help while
+>X=1
+>while [[ "${X}" -eq 1 ]]
+>do
+>  echo "This is the value of X: ${X}"
+>  X=7
+>done
 
+>type -a true
+>help true
+>man true
+>q
+>true
+>echo ${?}
+>true blah
+>echo ${?}
+
+>type -a sleep
+>man sleep
+>sleep 1
+>sleep 1s
+>sleep .5
+
+>while [[ true  ]]
+> do
+> echo "${RANDOM}"
+> sleep 1
+> done	#ctr+c to interupt
+
+>sleep 10m
+> # ctr+c
+
+>type -a shift
+>helpshift
+#==============================================================================================#
+
+>cd shellclass
+>cd localusers
+>vagrant up
+>vagrant ssh
+>cd /vagrant
+>vim luser-demo07.sh
+	#!/bin/bash
+	
+	# Demonstrate the use of shift and while loops
+
+ 	# Display the first three parameters.
+	echo "Parameter 1: ${1}"
+	echo "Parameter 2: ${2}"
+	echo "Parameter 3: ${3}"
+	echo				#run after this line # ./luser-demo07.sh 
+					# ./luser-demo07.sh apple 	
+					# ./luser-demo07.sh apple bread	 
+					# ./luser-demo07.sh apple bread candy 
+					# ./luser-demo07.sh apple bread candy dumplings 
+					# positional parameters
+	# Loop through all the positional parameters.
+	while [[ "${#}" -gt 0 ]]		#"${#}" number of parameters
+	do
+	  echo "Number of parameters: ${#}"
+	  echo "Parameter 1: ${1}"
+	  echo "Parameter 2: ${2}"
+	  echo "Parameter 3: ${3}"
+	  echo
+	  shift
+	done				# execute at script upto this line
+					#run after this line # ./luser-demo07.sh 
+					# ./luser-demo07.sh apple 	
+					# ./luser-demo07.sh apple bread	 
+					# ./luser-demo07.sh apple bread candy 
+					# ./luser-demo07.sh apple bread candy dumplings 
+
+>chmod 755 luser-demo07.sh
+>./luser-demo07.sh
+
+**** PENDING: Exercise 3 
+
+#==============================================================================================#
+		## SECTION 5: LINUX PROGRAMMING CONVENTIONS
+#==============================================================================================#
+===============================================================================================
+# 23.ADVANCED STANDARD INPUT, STANDARD OUTPUT AND STANDARD ERROR- PART1
+===============================================================================================
+#==============================================================================================#
+		## SIDE NOTES
+# standard input comes from keyboard or pipe on a output to make it input to other command
+# std output & std error - printed to screen
+>id -un > id
+>cat id
+>echo "${UID}" > uid
+>cat uid
+>echo "#{UID}" > /uid
+>ls -ld 
+
+>echo "secret" > password		# < std input comes from a file
+>cat password
+>sudo passwd --stdin einstein < password
+>su - einstein
+>echo "new" > password			# > overwrites the file # >> appends the file
+>cat password
+>echo "Another-Line" >> password
+>cat password
+>date | sha256sum | hea -c10  >> password
+>cat password
+>
+#==============================================================================================#
+>cd shellclass
+>cd localusers
+>vagrant up
+>vagrant ssh
+>cd /vagrant
+>vim luser-demo08.sh
+
+	#!/bin/bash
+	
+	# This script Demonstrate I/O redirection.
+
+	# Redirect STDOUT to a file.
+	FILE="/tmp/data"
+	head -n1 /etc/passwd > ${FILE}		# execute script upto here #then - cat /tmp/data
+
+	# Redirect STDIN to a program.
+	read LINE < ${FILE}			# reading first line of file
+	echo "LINE contains: ${LINE}"		# execute script upto here
+
+	# Redirect STDOUT to a file, overwriting the file.
+	head -n3 /etc/passwd > ${FILE}
+	echo 
+	echo "Contents of ${FILE}"
+	cat ${FILE}				# execute script upto here
+
+	# Redirect STDOUT to a file, appending to the file. 
+	echo "${RANDOM} ${RANDOM}" >> ${FILE}
+	echo "${RANDOM} ${RANDOM}" >> ${FILE}
+	echo 
+	echo "Contents of ${FILE}"
+	cat ${FILE}				# execute script upto here
+
+>chmod 755 luser-demo08.sh
+>./luser-demo08.sh
+
+===============================================================================================
+# 24.ADVANCED STANDARD INPUT, STANDARD OUTPUT AND STANDARD ERROR- PART2
+===============================================================================================
+#==============================================================================================#
+		## SIDE NOTES
+# file descriptors - FD 0 / FD 1 /FD 2 ==> STDIN / STDOUT / STDERR
+> cat /etc/centos-release
+#STDIN redirection
+>read X < /etc/centos-release 		#implicit way
+> echo ${X}		 
+>read X 0< /etc/centos-release 		# Explicit way 	#no space before <
+					#if space- 0 will be supplied as arguement
+> echo ${X}
+>read X 0 < /etc/centos-release		# This is wrong
+
+# STDOUT redirection
+>echo "${UID}" > uid
+>cat uid
+>echo "${UID}" 1> uid
+>cat uid
+>echo "${UID}" 1 > uid			# This is wrong (space before >)
+>cat uid
+
+>echo "${UID}" 1
+
+>head -n1 /etc/passwd /etc/hosts	# display first line of passwd & hosts files
+>head -n1 /etc/passwd /etc/hosts /fakefile	# throws error, fakefile does not exist
+						# This is STDERR
+>head -n1 /etc/passwd /etc/hosts /fakefile > head.out	#STDERR not redirected to file, sent to screen
+>cat head.out
+
+# Redirecting error to a file
+>head -n1 /etc/passwd /etc/hosts /fakefile 2> head.err	# redirecting error not output (FD 2)
+>cat head.err
+>rm head.out head.err
+
+# Redirecting both out put and error to 2 different files
+>head -n1 /etc/passwd /etc/hosts /fakefile > head.out 2> head.err
+>cat head.out
+>cat head.err
+
+# Redirecting both out put and error to 2 different files, appending error 
+>head -n1 /etc/passwd /etc/hosts /fakefile > head.out 2>> head.err
+>head -n1 /etc/passwd /etc/hosts /fakefile > head.out 2>> head.err
+>head -n1 /etc/passwd /etc/hosts /fakefile > head.out 2>> head.err
+>cat head.out
+>cat head.err
+
+# Redirecting both output & error to same file (old syntax)
+>head -n1 /etc/passwd /etc/hosts /fakefile > head.both 2>&1
+>cat head.both
+>rm head.both
+
+# Redirecting both output & error to same file (newsyntax)
+>head -n1 /etc/passwd /etc/hosts /fakefile &> head.both
+>cat head.both
+>rm head.both
+
+>head -n1 /etc/passwd /etc/hosts /fakefile &> head.both			#appending
+>cat head.both
+>rm head.both
+
+>man cat		#check -n option
+>head -n1 /etc/passwd /etc/hosts /fakefile
+>head -n1 /etc/passwd /etc/hosts /fakefile | cat -n
+>head -n1 /etc/passwd /etc/hosts /fakefile 2>&1 | cat -n
+>head -n1 /etc/passwd /etc/hosts /fakefile |& cat -n
+
+>echo 'error' | cat -n
+>echo 'error' >&2 | cat -n
+>echo 'error' 1>&2 | cat -n 	# same as above
+
+#==============================================================================================#
+# IMPARTANT: use the file from previous section and append the below lines of script
+	
+	# Redirect STDIN to a program, using FD 0.
+	read LINE 0> ${FILE}
+	echo
+	echo "Line containes: ${LINE}"
+
+	# Redirect STDOUT to a file using FD 1, overwriting the file.
+	head -n3 /etc/passwd 1> ${FILE}
+	echo
+	echo "Contents of the ${FILE}: "
+	cat ${FILE}				# execute till here
+
+	# Redirect STDRR to a file using FD 2.
+	ERR_FILE="/tmp/data.err"
+	head -n3 /etc/passwd /fakefile 2> ${ERR_FILE}	# Execute till here #cat /tmp/data.err
+
+	# Redirect STDOUT and STDERR to a file.
+	head -n3 /etc/passwd /fakefile &> ${FILE}
+	echo
+	echo "Contets of the ${FILE}:"
+	cat ${FILE}					#execute till here
+
+	# Redirect STDOUT and STDERR to a file through a pipe.
+	echo 
+	head -n3 /etc/passwd /fakefile |& cat -n 	# execute till here
+
+	# Send output to STDERR
+	echo "This is STDERR!" >&2			#execute till here
+
+**** Stopped video @20min
 
 
 
